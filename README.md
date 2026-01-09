@@ -56,10 +56,24 @@ started with Machine Learning Operations (MLOps).
 
 ## Set-up
 Make sure you have the uv package manager and uvx for tool invocations are installed
-`uv --version`
+```
+uv --version
+```
 
 Install and sync dependencies:
-`uv sync`
+```
+uv sync
+```
 
-Processed data in data/processed is created by running
-`uvx invoke preprocess-data`
+Processed data in data/processed is created by running (already done)
+```
+uvx invoke preprocess-data
+```
+
+### Wandb
+Create a file .env, add the following:
+```
+WANDB_API_KEY=""
+WANDB_PROJECT=cds_predictor
+WANDB_ENTITY=mlops_group42
+```
