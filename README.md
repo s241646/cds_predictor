@@ -7,14 +7,11 @@ The overall goal of this project is to develop and train a model that can predic
 
 While more complex problem definitions are required to make it useful for real-world scenarios, this project scope is a step in that direction. 
 
-*[Write about framework we are going to use]*
-
 The dataset we use is a simplified subset of a dataset curated by a group member for another project. The simplified dataset used for this project is placed in ```/data/raw/```. Input sequences are short DNA fragments of 300 nucleotides, with a vocabulary of {A, T, G, C}, labeled as 0 (non-coding) or 1 (coding).
 
 The dataset includes sequences from 8 bacterial genomes. Sequences are partiotioned so that 4 genomes are used for the training set, 2 genomes for the validation set, and 2 genomes for the test set. This ensures that no sequences from the same genome appear in different partitions. One could also split the sequences based on sequence similarity, but this approach is computationally intensive and not related to the scope of the MLOps course. 
 
 We are not completely sure what model framework we will end up using, but our plan is to one-hot encode sequences and start with a simple CNN-based architecture. 
-*[Write about models we exepct to use]*
 
 ## Project structure
 
