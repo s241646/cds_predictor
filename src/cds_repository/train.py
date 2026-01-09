@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import os
 from dataclasses import dataclass
 from datetime import datetime
@@ -73,6 +74,7 @@ def run_training(
     val_loader,
     cfg: TrainConfig | None = None,
     experiment_name: str | None = None,
+    logger: logging.Logger | None = None,
 ) -> Path:
     cfg = cfg or TrainConfig()
     device = get_device()
@@ -121,6 +123,12 @@ def run_training(
             f"train_loss={train_loss:.4f} | "
             f"val_loss={val_metrics.loss:.4f} | val_acc={val_metrics.acc:.4f}"
         )
+        if logger is not None:
+            logger.info(
+                f"Epoch {epoch:02d}/{cfg.epochs} | "
+                f"train_loss={train_loss:.4f} | "
+                f"val_loss={val_metrics.loss:.4f} | val_acc={val_metrics.acc:.4f}"
+            )
 
         # Save best / early stopping
         if val_metrics.loss < best_val_loss:
@@ -130,7 +138,10 @@ def run_training(
         else:
             epochs_without_improvement += 1
             if epochs_without_improvement >= cfg.patience:
-                print(f"Early stopping at epoch {epoch}")
+                msg = f"Early stopping at epoch {epoch}"
+                print(msg)
+                if logger is not None:
+                    logger.info(msg)
                 break
 
         # Step LR scheduler on validation loss (if configured)
@@ -147,13 +158,27 @@ def run_training(
 
 @hydra.main(config_path="../../configs", config_name="config", version_base=None)
 def main(cfg) -> None:
+    # setup logging to write to Hydra outputs folder
+    log_file = Path("train.log")
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        handlers=[
+            logging.FileHandler(log_file),
+            logging.StreamHandler(),
+        ],
+    )
+    logger = logging.getLogger(__name__)
+    logger.info(f"Training with config: {cfg}")
+    
     # load dataloaders using config values
     batch_size = cfg.hyperparameters.batch_size if "hyperparameters" in cfg else getattr(cfg, "batch_size", 32)
     num_workers = getattr(cfg, "num_workers", 0)
     train_loader, val_loader = get_dataloaders(batch_size=batch_size, num_workers=num_workers)
+    logger.info(f"Loaded dataloaders with batch_size={batch_size}, num_workers={num_workers}")
 
     # pass the Hydra config (DictConfig) directly to run_training; it provides attribute access
-    run_training(train_loader, val_loader, cfg=cfg)
+    run_training(train_loader, val_loader, cfg=cfg, logger=logger)
 
 
 if __name__ == "__main__":
