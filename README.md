@@ -81,6 +81,35 @@ Processed data in data/processed is created by running (already done)
 uvx invoke preprocess-data
 ```
 
+## Key Commands
+
+### Package Management
+```bash
+uv add <package-name>          # Install a package
+uv sync                        # Sync dependencies with pyproject.toml
+```
+
+### Running Code
+```bash
+uv run <script-name>.py        # Run a Python script
+uv run invoke --list           # List available tasks
+uv run invoke <task-name>      # Run a specific task
+```
+
+### Testing & Code Quality
+```bash
+uv run pytest tests/           # Run all tests
+uv run ruff format .           # Format code
+uv run ruff check . --fix      # Lint and fix issues
+uv run pre-commit run --all-files  # Run pre-commit hooks
+```
+
+### Documentation
+```bash
+uv run mkdocs serve            # Build and serve docs locally
+```
+
+
 ### Wandb
 Create a file .env, add the following:
 ```
