@@ -11,6 +11,8 @@ from torch.utils.tensorboard import SummaryWriter
 
 from cds_repository.model import build_model
 from cds_repository.evaluate import evaluate
+from cds_repository.data import get_dataloaders
+import hydra
 
 
 def get_device() -> torch.device:
@@ -143,9 +145,16 @@ def run_training(
     return out_path
 
 
+@hydra.main(config_path="../../configs", config_name="config", version_base=None)
+def main(cfg) -> None:
+    # load dataloaders using config values
+    batch_size = cfg.hyperparameters.batch_size if "hyperparameters" in cfg else getattr(cfg, "batch_size", 32)
+    num_workers = getattr(cfg, "num_workers", 0)
+    train_loader, val_loader = get_dataloaders(batch_size=batch_size, num_workers=num_workers)
+
+    # pass the Hydra config (DictConfig) directly to run_training; it provides attribute access
+    run_training(train_loader, val_loader, cfg=cfg)
+
+
 if __name__ == "__main__":
-    from cds_repository.data import get_dataloaders
-
-    train_loader, val_loader = get_dataloaders()
-
-    run_training(train_loader, val_loader)
+    main()
