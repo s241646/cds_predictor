@@ -9,6 +9,7 @@ from pathlib import Path
 import torch
 import torch.nn.functional as F
 from torch.utils.tensorboard import SummaryWriter
+import wandb
 
 from cds_repository.model import build_model
 from cds_repository.evaluate import evaluate
@@ -40,6 +41,10 @@ class TrainConfig:
     # logging
     log_dir: str = "logs"
     tensorboard: bool = True
+    # wandb config
+    wandb_project: str = "cds_predictor"
+    wandb_entity: str | None = None
+    use_wandb: bool = True
 
 
 def train_one_epoch(model: torch.nn.Module, loader, optimizer, device: torch.device) -> float:
@@ -78,6 +83,26 @@ def run_training(
 ) -> Path:
     cfg = cfg or TrainConfig()
     device = get_device()
+
+    # Initialize wandb if enabled
+    if cfg.use_wandb:
+        wandb.init(
+            project=cfg.wandb_project,
+            entity=cfg.wandb_entity,
+            name=experiment_name,
+            config={
+                "epochs": cfg.epochs,
+                "lr": cfg.lr,
+                "weight_decay": cfg.weight_decay,
+                "patience": cfg.patience,
+                "channels": cfg.channels,
+                "kernel_sizes": cfg.kernel_sizes,
+                "dropout": cfg.dropout,
+                "scheduler_factor": cfg.scheduler_factor,
+                "scheduler_patience": cfg.scheduler_patience,
+            },
+            tags=["cds", "dna", "classification"],
+        )
 
     # Initialize TensorBoard writer
     writer = None
@@ -118,6 +143,16 @@ def run_training(
             writer.add_scalar("Accuracy/val", val_metrics.acc, epoch)
             writer.add_scalar("LearningRate", optimizer.param_groups[0]["lr"], epoch)
 
+        # Log to wandb
+        if cfg.use_wandb:
+            wandb.log({
+                "epoch": epoch,
+                "loss/train": train_loss,
+                "loss/val": val_metrics.loss,
+                "accuracy/val": val_metrics.acc,
+                "learning_rate": optimizer.param_groups[0]["lr"],
+            })
+
         print(
             f"Epoch {epoch:02d}/{cfg.epochs} | "
             f"train_loss={train_loss:.4f} | "
@@ -151,6 +186,22 @@ def run_training(
     if writer is not None:
         writer.close()
         print(f"TensorBoard logs saved to: {log_dir}")
+
+    # Log model artifact to wandb model registry
+    if cfg.use_wandb:
+        artifact = wandb.Artifact(
+            name=cfg.save_name.replace(".pt", ""),
+            type="model",
+            metadata={
+                "channels": cfg.channels,
+                "kernel_sizes": cfg.kernel_sizes,
+                "dropout": cfg.dropout,
+                "best_val_loss": float(best_val_loss),
+            }
+        )
+        artifact.add_file(str(out_path))
+        wandb.log_artifact(artifact)
+        wandb.finish()
 
     print(f"Saved best checkpoint to: {out_path}")
     return out_path

@@ -15,6 +15,11 @@
     `tasks.py` file.
 * The project uses `pre-commit` for managing pre-commit hooks. To run all hooks on all files, use
     `uv run pre-commit run --all-files`. For more information, refer to the `.pre-commit-config.yaml` file.
+* The project uses `wandb` for experiment tracking and hyperparameter optimization:
+    * To login: `uv run wandb login`
+    * To create a sweep: `uv run invoke sweep-create`
+    * To run sweep agent: `uv run invoke sweep-agent --sweep-id "<sweep_id>"`
+    * See `docs/source/wandb_guide.md` for detailed documentation.
 
 # Code style
 

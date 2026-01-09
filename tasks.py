@@ -84,6 +84,34 @@ def tensorboard(ctx: Context, logdir: str = "logs") -> None:
     ctx.run(f"uv run tensorboard --logdir {logdir}", echo=True, pty=not WINDOWS)
 
 @task
+def sweep_create(ctx: Context, config_file: str = "configs/sweep.yaml") -> None:
+    """Create a wandb hyperparameter optimization sweep.
+    
+    Args:
+        config_file: Path to sweep configuration file (default: configs/sweep.yaml).
+    
+    Example:
+        uv run invoke sweep-create
+    """
+    ctx.run(f"uv run wandb sweep {config_file}", echo=True, pty=not WINDOWS)
+
+@task
+def sweep_agent(ctx: Context, sweep_id: str) -> None:
+    """Run a wandb sweep agent for hyperparameter optimization.
+    
+    Args:
+        sweep_id: The sweep ID returned by sweep-create (format: project/sweep_id).
+    
+    Example:
+        uv run invoke sweep-agent --sweep-id "username/cds_predictor/a1b2c3d4"
+    """
+    ctx.run(
+        f"uv run wandb agent {sweep_id}",
+        echo=True,
+        pty=not WINDOWS
+    )
+
+@task
 def test(ctx: Context) -> None:
     """Run tests."""
     ctx.run("uv run coverage run -m pytest tests/", echo=True, pty=not WINDOWS)
