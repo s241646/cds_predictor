@@ -9,8 +9,11 @@ from pathlib import Path
 import torch
 import torch.nn.functional as F
 from torch.utils.tensorboard import SummaryWriter
+import pytorch_lightning as pl
+from pytorch_lightning import Trainer
+from pytorch_lightning.callbacks import  ModelCheckpoint, EarlyStopping
 
-from cds_repository.model import build_model
+from cds_repository.model import MotifCNNModule
 from cds_repository.evaluate import evaluate
 from cds_repository.data import get_dataloaders
 import hydra
@@ -42,120 +45,6 @@ class TrainConfig:
     tensorboard: bool = True
 
 
-def train_one_epoch(model: torch.nn.Module, loader, optimizer, device: torch.device) -> float:
-    model.train()
-    total = 0
-    total_loss = 0.0
-
-    for x, y in loader:
-        x = x.to(device).float()
-        y = y.to(device).float()
-
-        optimizer.zero_grad(set_to_none=True)
-        logits = model(x)
-        loss = F.binary_cross_entropy_with_logits(logits, y)
-        loss.backward()
-        optimizer.step()
-
-        n = y.numel()
-        total += n
-        total_loss += loss.item() * n
-
-    return total_loss / total if total > 0 else float("nan")
-
-
-def save_checkpoint(model: torch.nn.Module, path: Path) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    torch.save({"state_dict": model.state_dict()}, path)
-
-
-def run_training(
-    train_loader,
-    val_loader,
-    cfg: TrainConfig | None = None,
-    experiment_name: str | None = None,
-    logger: logging.Logger | None = None,
-) -> Path:
-    cfg = cfg or TrainConfig()
-    device = get_device()
-
-    # Initialize TensorBoard writer
-    writer = None
-    if cfg.tensorboard:
-        log_dir = Path(cfg.log_dir)
-        if experiment_name:
-            log_dir = log_dir / experiment_name
-        else:
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            log_dir = log_dir / f"run_{timestamp}"
-        writer = SummaryWriter(str(log_dir))
-
-    model = build_model(
-        in_channels=4,
-        channels=cfg.channels,
-        kernel_sizes=cfg.kernel_sizes,
-        dropout=cfg.dropout,
-        pool="max",
-    ).to(device)
-    optimizer = torch.optim.AdamW(model.parameters(), lr=cfg.lr, weight_decay=cfg.weight_decay)
-    scheduler = None
-    if getattr(cfg, "use_scheduler", False):
-        scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
-            optimizer, factor=cfg.scheduler_factor, patience=cfg.scheduler_patience
-        )
-    best_val_loss = float("inf")
-    out_path = Path(cfg.save_dir) / cfg.save_name
-    epochs_without_improvement = 0
-
-    for epoch in range(1, cfg.epochs + 1):
-        train_loss = train_one_epoch(model, train_loader, optimizer, device)
-        val_metrics = evaluate(model, val_loader, device)
-
-        # Log to TensorBoard
-        if writer is not None:
-            writer.add_scalar("Loss/train", train_loss, epoch)
-            writer.add_scalar("Loss/val", val_metrics.loss, epoch)
-            writer.add_scalar("Accuracy/val", val_metrics.acc, epoch)
-            writer.add_scalar("LearningRate", optimizer.param_groups[0]["lr"], epoch)
-
-        print(
-            f"Epoch {epoch:02d}/{cfg.epochs} | "
-            f"train_loss={train_loss:.4f} | "
-            f"val_loss={val_metrics.loss:.4f} | val_acc={val_metrics.acc:.4f}"
-        )
-        if logger is not None:
-            logger.info(
-                f"Epoch {epoch:02d}/{cfg.epochs} | "
-                f"train_loss={train_loss:.4f} | "
-                f"val_loss={val_metrics.loss:.4f} | val_acc={val_metrics.acc:.4f}"
-            )
-
-        # Save best / early stopping
-        if val_metrics.loss < best_val_loss:
-            best_val_loss = val_metrics.loss
-            epochs_without_improvement = 0
-            save_checkpoint(model, out_path)
-        else:
-            epochs_without_improvement += 1
-            if epochs_without_improvement >= cfg.patience:
-                msg = f"Early stopping at epoch {epoch}"
-                print(msg)
-                if logger is not None:
-                    logger.info(msg)
-                break
-
-        # Step LR scheduler on validation loss (if configured)
-        if scheduler is not None:
-            scheduler.step(val_metrics.loss)
-
-    if writer is not None:
-        writer.close()
-        print(f"TensorBoard logs saved to: {log_dir}")
-
-    print(f"Saved best checkpoint to: {out_path}")
-    return out_path
-
-
 @hydra.main(config_path="../../configs", config_name="config", version_base=None)
 def main(cfg) -> None:
     # setup logging to write to Hydra outputs folder
@@ -170,6 +59,11 @@ def main(cfg) -> None:
     )
     logger = logging.getLogger(__name__)
     logger.info(f"Training with config: {cfg}")
+
+    #seed
+    seed = getattr(cfg, "seed", 42)
+    pl.seed_everything(seed)
+    logger.info(f"Set random seed to {seed}")
     
     # load dataloaders using config values
     batch_size = cfg.hyperparameters.batch_size if "hyperparameters" in cfg else getattr(cfg, "batch_size", 32)
@@ -178,8 +72,45 @@ def main(cfg) -> None:
     logger.info(f"Loaded dataloaders with batch_size={batch_size}, num_workers={num_workers}")
 
     # pass the Hydra config (DictConfig) directly to run_training; it provides attribute access
-    run_training(train_loader, val_loader, cfg=cfg, logger=logger)
+    # run_training(train_loader, val_loader, cfg=cfg, logger=logger)
+    model = MotifCNNModule(
+        in_channels=cfg.in_channels,
+        lr=cfg.lr,
+        channels=cfg.channels,
+        kernel_sizes=cfg.kernel_sizes,
+        dropout=cfg.dropout,
+        weight_decay=cfg.weight_decay,
+        use_scheduler=cfg.use_scheduler,
+        scheduler_factor=cfg.scheduler_factor,
+        scheduler_patience=cfg.scheduler_patience,
+    )
 
+    #Wandb Logger
+    wandb_logger = pl.loggers.WandbLogger(project='cds_predictor', log_model='all')
+
+    #Callbacks
+    checkpoint_callback = ModelCheckpoint(
+        monitor='val/loss',
+        dirpath=cfg.save_dir,
+        filename='best-{epoch:02d}-{val_loss:.2f}',
+        save_top_k=1,
+        mode='min',
+    )
+    early_stopping_callback = EarlyStopping(
+        monitor='val/loss',
+        patience=cfg.patience,
+        mode='min',
+    )
+
+
+    trainer = Trainer(
+        max_epochs=cfg.epochs,
+        logger=wandb_logger,
+        callbacks=[checkpoint_callback, early_stopping_callback],
+        accelerator='auto',
+    )
+
+    trainer.fit(model, train_loader, val_loader)
 
 if __name__ == "__main__":
     main()
