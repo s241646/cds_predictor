@@ -29,9 +29,6 @@ jobs:
         run: |
           uv sync
 
-      - name: Create reports folder
-        run: mkdir -p reports
-
       - name: Run tests with pytest
         run: |
           uv run coverage run --omit="*/_remote_module_non_scriptable.py" -m pytest tests/
