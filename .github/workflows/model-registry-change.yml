@@ -1,0 +1,22 @@
+name: Model Registry Change Workflow
+
+on:
+  push:
+    paths:
+      - "models/**"
+      - "models.dvc"
+  workflow_dispatch:
+
+jobs:
+  model-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: uv sync
+      - name: Quick model check
+        run: uv run python -c "from pathlib import Path; assert any(Path('models').glob('*.pt')), 'No model artifacts found'"
