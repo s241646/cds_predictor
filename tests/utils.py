@@ -1,5 +1,3 @@
-import random
-import pandas as pd
 from pathlib import Path
 
 
@@ -33,11 +31,7 @@ def make_position_encoded_csv(
         rows.append(row)
 
     # 👇 FIX: explicitly set column order
-    feature_cols = [
-        f"pos_{i}_{n}"
-        for i in range(seq_len)
-        for n in ["A", "T", "C", "G"]
-    ]
+    feature_cols = [f"pos_{i}_{n}" for i in range(seq_len) for n in ["A", "T", "C", "G"]]
 
     df = pd.DataFrame(rows)
     df = df[feature_cols + ["label"]]

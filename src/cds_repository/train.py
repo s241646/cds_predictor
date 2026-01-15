@@ -1,20 +1,15 @@
 from __future__ import annotations
 
 import logging
-import os
 from dataclasses import dataclass
-from datetime import datetime
 from pathlib import Path
 
 import torch
-import torch.nn.functional as F
-from torch.utils.tensorboard import SummaryWriter
 import pytorch_lightning as pl
 from pytorch_lightning import Trainer
-from pytorch_lightning.callbacks import  ModelCheckpoint, EarlyStopping
+from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
 
 from cds_repository.model import MotifCNNModule
-from cds_repository.evaluate import evaluate
 from cds_repository.data import get_dataloaders
 import hydra
 
@@ -60,11 +55,11 @@ def main(cfg) -> None:
     logger = logging.getLogger(__name__)
     logger.info(f"Training with config: {cfg}")
 
-    #seed
+    # seed
     seed = getattr(cfg, "seed", 42)
     pl.seed_everything(seed)
     logger.info(f"Set random seed to {seed}")
-    
+
     # load dataloaders using config values
     batch_size = cfg.hyperparameters.batch_size if "hyperparameters" in cfg else getattr(cfg, "batch_size", 32)
     num_workers = getattr(cfg, "num_workers", 0)
@@ -85,33 +80,33 @@ def main(cfg) -> None:
         scheduler_patience=cfg.scheduler_patience,
     )
 
-    #Wandb Logger
-    wandb_logger = pl.loggers.WandbLogger(project='cds_predictor', log_model='all')
+    # Wandb Logger
+    wandb_logger = pl.loggers.WandbLogger(project="cds_predictor", log_model="all")
 
-    #Callbacks
+    # Callbacks
     checkpoint_callback = ModelCheckpoint(
-        monitor='val/loss',
+        monitor="val/loss",
         dirpath=cfg.save_dir,
-        filename='best-{epoch:02d}-{val_loss:.2f}',
+        filename="best-{epoch:02d}-{val_loss:.2f}",
         save_top_k=1,
-        mode='min',
+        mode="min",
     )
     early_stopping_callback = EarlyStopping(
-        monitor='val/loss',
+        monitor="val/loss",
         patience=cfg.patience,
-        mode='min',
+        mode="min",
     )
-
 
     trainer = Trainer(
         max_epochs=cfg.epochs,
         logger=wandb_logger,
         callbacks=[checkpoint_callback, early_stopping_callback],
-        accelerator='auto',
-        #profiler="simple",
+        accelerator="auto",
+        # profiler="simple",
     )
 
     trainer.fit(model, train_loader, val_loader)
+
 
 if __name__ == "__main__":
     main()

@@ -4,6 +4,7 @@ import torch
 import torch.nn as nn
 import pytorch_lightning as pl
 
+
 class MotifCNN(nn.Module):
     """
     Strong, simple baseline for fixed-length DNA binary classification.
@@ -53,7 +54,7 @@ class MotifCNN(nn.Module):
             self.global_pool = nn.AdaptiveAvgPool1d(1)
 
         self.classifier = nn.Sequential(
-            nn.Flatten(),      # (B, C, 1) -> (B, C)
+            nn.Flatten(),  # (B, C, 1) -> (B, C)
             nn.Dropout(dropout),
             nn.Linear(c3, 1),  # -> (B, 1)
         )
@@ -69,10 +70,10 @@ class MotifCNN(nn.Module):
         if x.shape[1] != 4:
             raise ValueError(f"Expected 4 channels at dim=1, got {tuple(x.shape)}")
 
-        x = self.features(x)         # (B, C, L)
-        x = self.global_pool(x)      # (B, C, 1)
+        x = self.features(x)  # (B, C, L)
+        x = self.global_pool(x)  # (B, C, 1)
         logits = self.classifier(x)  # (B, 1)
-        return logits.squeeze(1)     # (B,)
+        return logits.squeeze(1)  # (B,)
 
 
 def build_model(**kwargs) -> MotifCNN:
@@ -86,7 +87,7 @@ class MotifCNNModule(pl.LightningModule):
     def __init__(
         self,
         lr: float = 1e-3,
-        #Model hyperparameters
+        # Model hyperparameters
         in_channels: int = 4,
         channels: tuple[int, int, int] = (64, 128, 256),
         kernel_sizes: tuple[int, int, int] = (7, 5, 3),
@@ -115,7 +116,7 @@ class MotifCNNModule(pl.LightningModule):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.model(x)
-    
+
     @staticmethod
     def _acc(logits: torch.Tensor, targets: torch.Tensor) -> float:
         preds = (torch.sigmoid(logits) >= 0.5).float()
@@ -149,7 +150,6 @@ class MotifCNNModule(pl.LightningModule):
         self.log("test/acc", acc, on_step=False, on_epoch=True)
 
         return {"loss": loss, "acc": acc}
-
 
     def configure_optimizers(self) -> torch.optim.Optimizer:
         opt = torch.optim.AdamW(self.parameters(), lr=self.lr, weight_decay=self.weight_decay)
