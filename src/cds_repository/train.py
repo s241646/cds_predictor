@@ -8,6 +8,7 @@ import torch
 import pytorch_lightning as pl
 from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
+import wandb
 
 from cds_repository.model import MotifCNNModule
 from cds_repository.data import get_dataloaders
@@ -85,14 +86,14 @@ def main(cfg) -> None:
 
     # Callbacks
     checkpoint_callback = ModelCheckpoint(
-        monitor="val/loss",
+        monitor="val_loss",
         dirpath=cfg.save_dir,
         filename="best-{epoch:02d}-{val_loss:.2f}",
         save_top_k=1,
         mode="min",
     )
     early_stopping_callback = EarlyStopping(
-        monitor="val/loss",
+        monitor="val_loss",
         patience=cfg.patience,
         mode="min",
     )
@@ -106,6 +107,23 @@ def main(cfg) -> None:
     )
 
     trainer.fit(model, train_loader, val_loader)
+
+    best_ckpt = checkpoint_callback.best_model_path
+    logger.info(f"Best checkpoint path: {best_ckpt}")
+
+    if best_ckpt:
+        artifact = wandb.Artifact(
+            name="motifcnn",
+            type="model",
+            description="Best MotifCNN checkpoint",
+            metadata=dict(cfg),
+        )
+        artifact.add_file(best_ckpt)
+        run = wandb_logger.experiment
+        logged_artifact = run.log_artifact(artifact)
+        logged_artifact.wait()
+
+    wandb_logger.experiment.finish()
 
 
 if __name__ == "__main__":
