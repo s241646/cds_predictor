@@ -118,11 +118,6 @@ def run_training(
             writer.add_scalar("Accuracy/val", val_metrics.acc, epoch)
             writer.add_scalar("LearningRate", optimizer.param_groups[0]["lr"], epoch)
 
-        print(
-            f"Epoch {epoch:02d}/{cfg.epochs} | "
-            f"train_loss={train_loss:.4f} | "
-            f"val_loss={val_metrics.loss:.4f} | val_acc={val_metrics.acc:.4f}"
-        )
         if logger is not None:
             logger.info(
                 f"Epoch {epoch:02d}/{cfg.epochs} | "
