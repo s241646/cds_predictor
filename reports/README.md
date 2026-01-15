@@ -53,7 +53,7 @@ will check the repositories and the code to verify your answers.
 ### Week 1
 
 * [x] Create a git repository (M5)
-* [ ] Make sure that all team members have write access to the GitHub repository (M5)
+* [x] Make sure that all team members have write access to the GitHub repository (M5)
 * [x] Create a dedicated environment for you project to keep track of your packages (M2)
 * [x] Create the initial file structure using cookiecutter with an appropriate template (M6)
 * [x] Fill out the `data.py` file such that it downloads whatever data you need and preprocesses it (if necessary) (M6)
@@ -70,9 +70,9 @@ will check the repositories and the code to verify your answers.
 * [x] Used Hydra to load the configurations and manage your hyperparameters (M11)
 * [ ] Use profiling to optimize your code (M12)
 * [x] Use logging to log important events in your code (M14)
-* [x] Use Weights & Biases to log training progress and other important metrics/artifacts in your code (M14)
-* [x] Consider running a hyperparameter optimization sweep (M14)
-* [ ] Use PyTorch-lightning (if applicable) to reduce the amount of boilerplate in your code (M15)
+* [x] Use Weights & Biases to log training progress and other important metrics/artifacts in your code (M14) [in progress]
+* [x] Consider running a hyperparameter optimization sweep (M14) [in progress]
+* [x] Use PyTorch-lightning (if applicable) to reduce the amount of boilerplate in your code (M15)
 
 ### Week 2
 
