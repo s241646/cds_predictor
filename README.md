@@ -117,3 +117,6 @@ WANDB_API_KEY=""
 WANDB_PROJECT=cds_predictor
 WANDB_ENTITY=mlops_group42
 ```
+
+## Unit-tests
+```uv run pytest tests```
