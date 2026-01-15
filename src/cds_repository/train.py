@@ -71,8 +71,8 @@ def main(cfg) -> None:
     train_loader, val_loader = get_dataloaders(batch_size=batch_size, num_workers=num_workers)
     logger.info(f"Loaded dataloaders with batch_size={batch_size}, num_workers={num_workers}")
 
-    # pass the Hydra config (DictConfig) directly to run_training; it provides attribute access
-    # run_training(train_loader, val_loader, cfg=cfg, logger=logger)
+    # pass the Hydra config (DictConfig) directly to run_training;
+
     model = MotifCNNModule(
         in_channels=cfg.in_channels,
         lr=cfg.lr,
@@ -108,6 +108,7 @@ def main(cfg) -> None:
         logger=wandb_logger,
         callbacks=[checkpoint_callback, early_stopping_callback],
         accelerator='auto',
+        profiler="simple",
     )
 
     trainer.fit(model, train_loader, val_loader)

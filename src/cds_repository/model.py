@@ -136,6 +136,21 @@ class MotifCNNModule(pl.LightningModule):
         self.log("val/loss", loss, on_epoch=True, prog_bar=True)
         self.log("val/acc", self._acc(logits, y), on_epoch=True, prog_bar=True)
 
+    def test_step(self, batch, batch_idx: int) -> None:
+        x, y = batch
+        x = x.float()
+        y = y.float()
+
+        logits = self(x)
+        loss = self.criterion(logits, y)
+        acc = self._acc(logits, y)
+
+        self.log("test/loss", loss, on_step=False, on_epoch=True)
+        self.log("test/acc", acc, on_step=False, on_epoch=True)
+
+        return {"loss": loss, "acc": acc}
+
+
     def configure_optimizers(self) -> torch.optim.Optimizer:
         opt = torch.optim.AdamW(self.parameters(), lr=self.lr, weight_decay=self.weight_decay)
         if self.use_scheduler:
