@@ -101,6 +101,10 @@ uv run invoke <task-name>      # Run a specific task
 uv run pytest tests/           # Run all tests
 uv run ruff format .           # Format code
 uv run ruff check . --fix      # Lint and fix issues
+```
+Pre-commit hooks:
+```
+uv run pre-commit install
 uv run pre-commit run --all-files  # Run pre-commit hooks
 ```
 
