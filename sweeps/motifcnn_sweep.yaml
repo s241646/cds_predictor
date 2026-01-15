@@ -1,0 +1,31 @@
+program: python
+method: random
+
+metric:
+  name: val/loss
+  goal: minimize
+
+parameters:
+  hyperparameters.learning_rate:
+    distribution: log_uniform_values
+    min: 1e-5
+    max: 1e-3
+
+  hyperparameters.batch_size:
+    values: [16, 32]
+
+  dropout:
+    values: [0.1, 0.2]
+
+  epochs:
+    values: [1]
+
+  weight_decay:
+    values: [0.01, 0.1]
+
+command:
+  - ${env}
+  - python
+  - -m
+  - cds_repository.train
+  - ${args_no_hyphens}
