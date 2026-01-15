@@ -32,8 +32,3 @@ jobs:
       - name: Run tests with pytest
         run: |
           uv run coverage run -m pytest tests/
-
-      - name: Calculate coverage and generate report
-        run: |
-          uv run coverage report -m
-          uv run coverage xml -o reports/coverage.xml

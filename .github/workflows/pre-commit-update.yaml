@@ -4,7 +4,8 @@ name: Pre-commit auto-update
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
 
   pull_request:
     branches:

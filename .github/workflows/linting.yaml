@@ -1,5 +1,14 @@
 name: Code linting
 
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+
 jobs:
   format:
     name: Check code formatting
