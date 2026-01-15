@@ -13,6 +13,7 @@ device = None
 
 class SequenceInput(BaseModel):
     """Input model for prediction request."""
+
     sequence: str
 
 
@@ -53,19 +54,19 @@ def predict(data: SequenceInput):
     """Predict CDS probability for a DNA sequence."""
     if model is None:
         return {"error": "Model not loaded"}
-    
+
     # Encode sequence
     encoded = encode_sequence(data.sequence)
     x = torch.from_numpy(encoded).unsqueeze(0).to(device)
-    
+
     # Predict
     with torch.no_grad():
         logits = model(x)
         probability = torch.sigmoid(logits).item()
-    
+
     return {
         "sequence": data.sequence,
         "length": len(data.sequence),
         "logits": logits.item(),
-        "probability": probability
+        "probability": probability,
     }

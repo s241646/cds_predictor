@@ -101,6 +101,10 @@ uv run invoke <task-name>      # Run a specific task
 uv run pytest tests/           # Run all tests
 uv run ruff format .           # Format code
 uv run ruff check . --fix      # Lint and fix issues
+```
+Pre-commit hooks:
+```
+uv run pre-commit install
 uv run pre-commit run --all-files  # Run pre-commit hooks
 ```
 
@@ -116,4 +120,13 @@ Create a file .env, add the following:
 WANDB_API_KEY=""
 WANDB_PROJECT=cds_predictor
 WANDB_ENTITY=mlops_group42
+```
+
+## Unit-tests
+```uv run pytest tests```
+
+## Coverage report
+```
+coverage run --omit="*/_remote_module_non_scriptable.py" -m pytest
+coverage report -m
 ```

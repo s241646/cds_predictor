@@ -9,7 +9,7 @@ on:
       - main
 
 jobs:
-  test:
+  unit-tests:
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
@@ -28,3 +28,8 @@ jobs:
       - name: Install dependencies
         run: |
           uv sync
+
+      - name: Run tests with pytest
+        run: |
+          uv run coverage run --omit="*/_remote_module_non_scriptable.py" -m pytest tests/
+          uv run coverage report -m > reports/coverage.txt

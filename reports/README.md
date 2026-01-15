@@ -76,8 +76,8 @@ will check the repositories and the code to verify your answers.
 
 ### Week 2
 
-* [ ] Write unit tests related to the data part of your code (M16)
-* [ ] Write unit tests related to model construction and or model training (M16)
+* [x] Write unit tests related to the data part of your code (M16)
+* [x] Write unit tests related to model construction and or model training (M16)
 * [ ] Calculate the code coverage (M16)
 * [ ] Get some continuous integration running on the GitHub repository (M17)
 * [ ] Add caching and multi-os/python/pytorch testing to your continuous integration (M17)
@@ -123,7 +123,7 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 1 fill here ---
+Group 42
 
 ### Question 2
 > **Enter the study number for each member in the group**
@@ -134,7 +134,7 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 2 fill here ---
+s241646, sXXXXXX, sXXXXXX, sXXXXXX
 
 ### Question 3
 > **Did you end up using any open-source frameworks/packages not covered in the course during your project? If so**
@@ -168,7 +168,7 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 4 fill here ---
+We used **uv** for managing our project dependencies. All required packages and their versions are tracked in the **uv.lock** file. To set up a new environment, clone the repository, install **uv** (https://docs.astral.sh/uv/getting-started/installation/), and then run **uv sync**. This command reads the **uv.lock** file and installs all dependencies as specified, ensuring an identical environment. When adding or updating packages, we use **uv add <package>**, which updates the lock file. 
 
 ### Question 5
 
@@ -218,7 +218,10 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 7 fill here ---
+In total, we have implemented **19 test**s covering the data, model, and training logic.
+The data tests validate raw and processed datasets, including CSV consistency and length, correct one-hot encoding, shape, and to validate the train/test/val splits. The model tests ensure MotifCNN and its Lightning wrapper handle input shapes correctly, raise errors on invalid inputs, and compute outputs and accuracy as expected. Finally, training-related tests verify that the training step and optimizer configuration work as expected, using a simplified, synthetic signal derived from the processed one-hot data to ensure fast, deterministic learning behavior.
+
+**TODO** write about API tests, if we make any
 
 ### Question 8
 
@@ -248,7 +251,9 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 9 fill here ---
+We used branches and PRs in our project. In our group, we used branches for adding new features. Each feature was developed separately on a branch, instead of the main branch. Most of the time one member worked on a branch, but other times a member could easily pick up another one's branch. 
+
+Once a feature or fix is complete, we created PRs to merge to main, with a short description of the changes / new feature. Most of the time other members reviewed the PRs (sometimes in person), to catch any issues before affecting other code. For changes to the README we directly committed to main. Overall, using branches and PRs helped keep our codebase organized and reduced merge conflicts, as well as be able to trace back to early versions, if needed.
 
 ### Question 10
 
