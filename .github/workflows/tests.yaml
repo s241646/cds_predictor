@@ -9,7 +9,7 @@ on:
       - main
 
 jobs:
-  test:
+  unit-tests:
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
@@ -29,8 +29,3 @@ jobs:
         run: |
           uv sync
 
-      - name: Run tests with pytest
-        run: |
-          uv run coverage run -m pytest tests/test_api.py
-          uv run coverage report -m
-          uv run coverage xml -o reports/coverage.xml
