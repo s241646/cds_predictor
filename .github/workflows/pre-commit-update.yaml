@@ -27,8 +27,23 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Run pre-commit
-        run: uv run pre-commit run --all-files 
-      
-      - name: Autoupdate workflow
-        run: uv run pre-commit autoupdate
+      - name: Run pre-commit autoupdate
+        run: uv run pre-commit autoupdate || true
+
+      - name: Run pre-commit (apply fixes)
+        run: uv run pre-commit run --all-files || true
+
+      - name: Commit and push changes to a branch
+        env:
+          BRANCH: pre-commit-autoupdate-${{ github.run_id }}
+        run: |
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
+          if git diff --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git add -A
+          git commit -m "chore: pre-commit autoupdate and fixes"
+          git checkout -b "$BRANCH"
+          git push --set-upstream origin "$BRANCH"
