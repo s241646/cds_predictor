@@ -1,10 +1,6 @@
 import pytorch_lightning as pl
 from cds_repository.model import MotifCNNModule
 from torch.utils.data import DataLoader, TensorDataset
-from cds_repository.data import load_dataset
-from pathlib import Path
-from tests import _PATH_DATA
-import torch
 
 
 def test_training_learns_on_processed_data(processed_dataloaders):
@@ -38,6 +34,7 @@ def test_training_learns_on_processed_data(processed_dataloaders):
     assert val_loss < 0.7
     assert train_acc > 0.65
     assert val_acc > 0.65
+
 
 def test_overfit_single_batch(processed_dataloaders):
     train_loader, _ = processed_dataloaders

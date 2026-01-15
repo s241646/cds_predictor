@@ -6,12 +6,13 @@ from cds_repository.data import CDSDataset, load_dataset
 from tests import _PATH_DATA
 from pathlib import Path
 
-RAW_PATH = Path(_PATH_DATA+"/raw")
-PROCESSED_PATH = Path(_PATH_DATA+"/processed")
+RAW_PATH = Path(_PATH_DATA + "/raw")
+PROCESSED_PATH = Path(_PATH_DATA + "/processed")
 
 # ------------------------
 # RAW DATA TESTS
 # ------------------------
+
 
 @pytest.mark.skipif(not RAW_PATH.exists(), reason="Raw data not found")
 @pytest.mark.parametrize("split", ["train", "val", "test"])
@@ -38,6 +39,7 @@ def test_raw_dataset_encodes_to_one_hot():
     assert x.shape == (4, len(nt_seq)), f"Input x shape {x.shape} does not match expected (4, {len(nt_seq)})"
     assert y.ndim == 0, "Label y is not a scalar tensor (ndim != 0)"
 
+
 @pytest.mark.skipif(not RAW_PATH.exists(), reason="Raw data not found")
 def test_raw_nt_seq_characters_valid():
     """Ensure nt_seq contains only expected DNA bases."""
@@ -51,6 +53,7 @@ def test_raw_nt_seq_characters_valid():
 # ------------------------
 # PROCESSED DATA TESTS
 # ------------------------
+
 
 @pytest.mark.skipif(not PROCESSED_PATH.exists(), reason="Processed data not found")
 def test_processed_dataset_shape():
@@ -82,6 +85,7 @@ def test_processed_one_hot_validity():
 # ------------------------
 # SHARED / SAFETY TESTS
 # ------------------------
+
 
 def test_invalid_split_raises():
     """Invalid split name should raise ValueError."""

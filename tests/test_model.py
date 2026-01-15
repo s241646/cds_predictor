@@ -1,6 +1,5 @@
 import pytest
 import torch
-import torch.nn as nn
 
 from cds_repository.model import MotifCNN, build_model, MotifCNNModule
 
@@ -8,6 +7,7 @@ from cds_repository.model import MotifCNN, build_model, MotifCNNModule
 # ------------------------
 # MotifCNN (nn.Module)
 # ------------------------
+
 
 def test_motifcnn_forward_channels_first():
     """Model should accept (B, 4, L) input."""
@@ -58,6 +58,7 @@ def test_build_model_returns_motifcnn():
 # MotifCNNModule (Lightning)
 # ------------------------
 
+
 def test_lightning_module_forward():
     """Lightning module forward should delegate to model."""
     module = MotifCNNModule()
@@ -97,4 +98,6 @@ def test_configure_optimizers_returns_expected():
 
     assert "optimizer" in config, "Optimizer config missing 'optimizer' key"
     assert "lr_scheduler" in config, "Optimizer config missing 'lr_scheduler' key"
-    assert isinstance(config["optimizer"], torch.optim.Optimizer), "'optimizer' is not an instance of torch.optim.Optimizer"
+    assert isinstance(
+        config["optimizer"], torch.optim.Optimizer
+    ), "'optimizer' is not an instance of torch.optim.Optimizer"

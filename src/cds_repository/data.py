@@ -27,7 +27,7 @@ class CDSDataset(Dataset):
             # Already encoded data - extract one-hot encoded features
             label_col = "label" if "label" in self.df.columns else self.df.columns[-1]
             self.labels = self.df[label_col].values.astype(np.float32)
-            
+
             # Get all feature columns (everything except label)
             feature_cols = [col for col in self.df.columns if col != label_col]
             self.sequences = self.df[feature_cols].values.astype(np.float32)
@@ -35,7 +35,7 @@ class CDSDataset(Dataset):
             # Raw sequence data - one-hot encode it
             self.sequences = []
             self.labels = self.df["label"].values.astype(np.float32)
-            
+
             for seq in self.df["nt_seq"]:
                 encoded = self._encode_sequence(seq)
                 self.sequences.append(encoded)
@@ -72,7 +72,7 @@ class CDSDataset(Dataset):
         """
         seq = self.sequences[index]
         label = self.labels[index]
-        
+
         # Reshape position-encoded data from flat (N*4,) to (L, 4) then (4, L)
         if seq.ndim == 1:
             # Reshape from position-encoded format (pos_0_A, pos_0_T, pos_0_C, pos_0_G, pos_1_A, ...)
@@ -80,7 +80,7 @@ class CDSDataset(Dataset):
         elif seq.ndim == 2 and seq.shape[0] != 4:
             # Reshape from (L, 4) to (4, L)
             seq = seq.T
-        
+
         return torch.from_numpy(seq), torch.tensor(label, dtype=torch.float32)
 
     def save(self, output_folder: Path) -> None:
@@ -195,9 +195,7 @@ def get_dataloaders(
     train_loader = load_dataloader(
         data_path, split="train", batch_size=batch_size, shuffle=True, num_workers=num_workers
     )
-    val_loader = load_dataloader(
-        data_path, split="val", batch_size=batch_size, shuffle=False, num_workers=num_workers
-    )
+    val_loader = load_dataloader(data_path, split="val", batch_size=batch_size, shuffle=False, num_workers=num_workers)
     return train_loader, val_loader
 
 
@@ -218,4 +216,3 @@ def preprocess(data_path: Path, output_folder: Path) -> None:
 
 if __name__ == "__main__":
     typer.run(preprocess)
-
