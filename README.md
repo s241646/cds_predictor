@@ -117,3 +117,12 @@ WANDB_API_KEY=""
 WANDB_PROJECT=cds_predictor
 WANDB_ENTITY=mlops_group42
 ```
+
+## Unit-tests
+```uv run pytest tests```
+
+## Coverage report
+```
+coverage run --omit="*/_remote_module_non_scriptable.py" -m pytest
+coverage report -m
+```

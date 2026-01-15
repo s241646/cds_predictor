@@ -166,3 +166,5 @@ class MotifCNNModule(pl.LightningModule):
                     "frequency": 1,
                 },
             }
+        if not self.use_scheduler:
+            return opt  # no lr scheduler

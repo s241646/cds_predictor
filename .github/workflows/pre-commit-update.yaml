@@ -3,9 +3,13 @@
 name: Pre-commit auto-update
 
 on:
-  schedule:
-    - cron: '0 0 * * *'
-  workflow_dispatch: {}  # Allows manual executions
+  push:
+    branches:
+      - main
+
+  pull_request:
+    branches:
+      - main
 
 permissions:
   contents: write
@@ -14,30 +18,33 @@ permissions:
 jobs:
   auto-update:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v7
         with:
-          python-version: 3.11
-          cache: 'pip'
-
-      - name: Upgrade pip
-        run: python -m pip install --upgrade pip
-
-      - name: Install pre-commit
-        run: pip install pre-commit
+          python-version: "3.12"
 
       - name: Run pre-commit autoupdate
-        run: pre-commit autoupdate
+        run: uv run pre-commit autoupdate || true
 
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v7
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          branch: update/pre-commit-autoupdate
-          title: Auto-update pre-commit hooks
-          commit-message: Auto-update pre-commit hooks
-          body: Update versions of tools in pre-commit configs to latest version
-          labels: dependencies
+      - name: Run pre-commit (apply fixes)
+        run: uv run pre-commit run --all-files || true
+
+      - name: Commit and push changes to a branch
+        env:
+          BRANCH: pre-commit-autoupdate-${{ github.run_id }}
+        run: |
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
+          if git diff --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git add -A
+          git commit -m "chore: pre-commit autoupdate and fixes"
+          git checkout -b "$BRANCH"
+          git push --set-upstream origin "$BRANCH"
