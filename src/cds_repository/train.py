@@ -108,7 +108,7 @@ def main(cfg) -> None:
         logger=wandb_logger,
         callbacks=[checkpoint_callback, early_stopping_callback],
         accelerator='auto',
-        profiler="simple",
+        #profiler="simple",
     )
 
     trainer.fit(model, train_loader, val_loader)
