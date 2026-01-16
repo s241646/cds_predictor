@@ -5,7 +5,7 @@ from tests.utils import make_position_encoded_csv
 
 @pytest.fixture(scope="session")
 def processed_dataloaders(tmp_path_factory):
-    data_dir = tmp_path_factory.mktemp("processed_data")
+    data_dir = tmp_path_factory.mktemp("processed_data/training")
 
     make_position_encoded_csv(data_dir / "train.csv.gz", n=256)
     make_position_encoded_csv(data_dir / "val.csv.gz", n=64)
