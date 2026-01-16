@@ -1,0 +1,37 @@
+# File: .github/workflows/docker-build-train.yml
+name: Docker Image Build Train
+
+on:
+  push:
+    branches:
+      - main  # Trigger on pushes to main branch
+  workflow_dispatch:  # Allow manual trigger from GitHub UI
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Docker Buildx (optional but recommended for advanced builds)
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      # Step 3: Build the Docker image
+      - name: Build Docker image
+        run: |
+          progress="plain"  # You can change this to "auto" or "tty"
+          docker build -t train:latest . -f dockerfiles/train.dockerfile --progress=$progress
+
+      # Step 4: (Optional) Push to Docker Hub or GitHub Container Registry
+      # - name: Log in to Docker Hub
+      #   uses: docker/login-action@v2
+      #   with:
+      #     username: ${{ secrets.DOCKER_USERNAME }}
+      #     password: ${{ secrets.DOCKER_PASSWORD }}
+      #
+      # - name: Push Docker image
+      #   run: docker push train:latest
