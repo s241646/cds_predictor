@@ -199,7 +199,11 @@ We used **uv** for managing our project dependencies. All required packages and 
 >
 > Answer:
 
---- question 6 fill here ---
+We use pre-commit hooks to automatically run checks before code is committed, ensuring consistent standards across the team during the project. For linting and code quality, we use Ruff, which helps catch common bugs, unused code, and style issues. For formatting, we used on Ruff Format, which ensures consistent code style with formatting rules which are enforced via pre-commit-hooks, for example removing trailing whitespace and ensuring files end with a newlines.
+
+Ruff provides lightweight type checks that improve code correctness. Documentation is supported through well-structured README files, which explain the project structure and usage.
+
+These rules and formalities matter in larger projects because many developers work on the same codebase over long periods of time. Consistent formatting and linting reduce code conflicts and bugs, and good documentation makes it easier for new developers to understand the codebase, contribute and improves maintainability.
 
 ## Version control
 
