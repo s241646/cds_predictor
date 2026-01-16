@@ -1,0 +1,14 @@
+# config_cpu.yaml
+workerPoolSpecs:
+    machineSpec:
+        machineType: n1-highmem-2
+    replicaCount: 1
+    containerSpec:
+        imageUri: 'europe-west1-docker.pkg.dev/cds-predictor/cds-repo/train:latest'
+        env:
+        - name: WANDB_API_KEY
+          value: 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
+        - name: WANDB_PROJECT
+          value: cds_predictor
+        - name: WANDB_ENTITY
+          value: mlops_group42
