@@ -132,7 +132,7 @@ coverage report -m
 ```
 
 ## Autoupdate workflow files manually
-Github Actions cannot autoupdate workflow files. At midnight, a PR with changes to the pre-commit workflow is created. 
+Github Actions cannot autoupdate workflow files. At midnight, a PR with changes to the pre-commit workflow is created.
 The workflow to create these PRs can be manually triggered in Github Actions > Pre-commit auto-update > Run Workflow > choose branch.
 
 You can also run the following in the terminal to do it manually:
@@ -143,4 +143,59 @@ git commit -am "chore: pre-commit autoupdate"
 git push origin pre-commit-autoupdate-xxxx
 ```
 
-sample push to main
+## GCP
+### TODO add info about dvc
+
+GCP repo of this project is at:
+europe-west1-docker.pkg.dev/cds-predictor/cds-repo
+On every push to main, an image is build and pushed.
+
+### To connect docker with gcloud:
+```
+gcloud auth configure-docker europe-west1-docker.pkg.dev
+```
+
+### To pull an image
+```
+docker pull europe-west1-docker.pkg.dev/cds-predictor/cds-repo/<image>:<tag>
+```
+For example:
+```
+docker pull europe-west1-docker.pkg.dev/cds-predictor/cds-repo/train:latest
+```
+
+### To push a local image to GCP:
+```
+docker tag train europe-west1-docker.pkg.dev/cds-predictor/cds-repo/train:latest
+docker push europe-west1-docker.pkg.dev/cds-predictor/cds-repo/train:latest
+```
+
+### Create a VM instance
+```
+gcloud compute instances create cds-instance \
+  --zone=europe-west1-b \
+  --machine-type=e2-standard-4 \
+  --image-family=pytorch-2-7-cu128-ubuntu-2204-nvidia-570 \
+  --image-project=deeplearning-platform-release
+```
+Log on to VM instance:
+```
+gcloud compute ssh cds-instance
+```
+Then log in with gh, clone repo, install dependencies etc.
+
+View VM on GCP:
+https://console.cloud.google.com/compute/instances?project=cds-predictor
+
+
+Train on VM
+```
+gcloud ai custom-jobs create \
+    --region=europe-west1 \
+    --display-name=train-run \
+    --config=config_cpu.yaml \
+    --command 'uvx invoke train'
+```
+
+View progress at GCP: Vertex AI > Model development > Training > Custom jobs
+https://console.cloud.google.com/vertex-ai/training/custom-jobs?project=cds-predictor
