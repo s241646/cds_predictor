@@ -194,7 +194,6 @@ gcloud ai custom-jobs create \
     --region=europe-west1 \
     --display-name=train-run \
     --config=config_cpu.yaml \
-    --command 'uvx invoke train'
 ```
 
 View progress at GCP: Vertex AI > Model development > Training > Custom jobs

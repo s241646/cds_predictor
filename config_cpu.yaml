@@ -1,6 +1,6 @@
 # config_cpu.yaml
 workerPoolSpecs:
-    machineSpec:
+  - machineSpec:
         machineType: n1-highmem-2
     replicaCount: 1
     containerSpec:

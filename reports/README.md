@@ -86,8 +86,8 @@ will check the repositories and the code to verify your answers.
 * [x] Add a continues workflow that triggers when data changes (M19)
 * [x] Add a continues workflow that triggers when changes to the model registry is made (M19)
 * [x] Create a data storage in GCP Bucket for your data and link this with your data version control setup (M21)
-* [ ] Create a trigger workflow for automatically building your docker images (M21)
-* [ ] Get your model training in GCP using either the Engine or Vertex AI (M21)
+* [x] Create a trigger workflow for automatically building your docker images (M21)
+* [x] Get your model training in GCP using either the Engine or Vertex AI (M21)
 * [ ] Create a FastAPI application that can do inference using your model (M22)
 * [ ] Deploy your model in GCP using either Functions or Run as the backend (M23)
 * [ ] Write API tests for your application and setup continues integration for these (M24)
@@ -240,14 +240,14 @@ The data tests validate raw and processed datasets, including CSV consistency an
 >
 > Answer:
 
-The total code coverage can be calculated manually by running 
+The total code coverage can be calculated manually by running
 ```
 uv run coverage run --omit="*/_remote_module_non_scriptable.py" -m pytest tests/
 uv run coverage report -m > reports/coverage.txt
 ```
-, and also is automatically calculated when pushes are made to main. The coverage report is available as an artifact and linked as URL in the workflow run under 'Upload coverage artifact'. 
+, and also is automatically calculated when pushes are made to main. The coverage report is available as an artifact and linked as URL in the workflow run under 'Upload coverage artifact'.
 
-The total code coverage of our code is 86%, which includes all our source files. Coverage is high overall, but some gaps remain, particularly in data.py and model.py, where certain branches and edge cases are not tested. While high coverage increases confidence in the correctness of the code, even 100% coverage would not guarantee it is completely error-free. Code coverage only measures which lines are executed during tests, not whether the logic is correct and bugs can still exist. If the tests do not cover all edge cases, the coverage is also irrepresentative of the code's performance. Therefore, while coverage is a valuable metric, it should be complemented with code reviews and further testing to ensure robust and reliable code. 
+The total code coverage of our code is 86%, which includes all our source files. Coverage is high overall, but some gaps remain, particularly in data.py and model.py, where certain branches and edge cases are not tested. While high coverage increases confidence in the correctness of the code, even 100% coverage would not guarantee it is completely error-free. Code coverage only measures which lines are executed during tests, not whether the logic is correct and bugs can still exist. If the tests do not cover all edge cases, the coverage is also irrepresentative of the code's performance. Therefore, while coverage is a valuable metric, it should be complemented with code reviews and further testing to ensure robust and reliable code.
 
 ### Question 9
 
@@ -296,15 +296,15 @@ Once a feature or fix is complete, we created PRs to merge to main, with a short
 >
 > Answer:
 
-For our continuous integration setup, we are running both unit tests and linting. We have defined multiple unit tests, and in our continuous integration pipeline we teston macOS, Ubuntu, and Windows. For all operative systems, we test Python versions 3.12 and 3.13. In addition, we test different PyTorch versions (2.5.0, 2.6.0, 2.7.0) on Ubuntu with both Python versions 3.12 and 3.13 to ensure compatability across our supported PyTorch range. 
+For our continuous integration setup, we are running both unit tests and linting. We have defined multiple unit tests, and in our continuous integration pipeline we teston macOS, Ubuntu, and Windows. For all operative systems, we test Python versions 3.12 and 3.13. In addition, we test different PyTorch versions (2.5.0, 2.6.0, 2.7.0) on Ubuntu with both Python versions 3.12 and 3.13 to ensure compatability across our supported PyTorch range.
 
 We make use of caching, though this is not explicitly visible in the workflow .yaml files. The setup-uv action (astral-sh/setup-uv@v7) has built-in caching that stores both the uv tool itself and the installed Python packages, speeding up our continuous integration runs.
 
-Our continuous integration setup can be seen in ```./.github/workflows/```. Specifically, we have organized it into the below separate files: 
+Our continuous integration setup can be seen in ```./.github/workflows/```. Specifically, we have organized it into the below separate files:
 - Unit testing with pytest (```tests.yaml```)
 - Code coverage calculation on Ubuntu with Python 3.12 (```coverage.yaml```) ##REMOVE?
 - Code linting check with ruff (```linting.yaml```)
-- Automated pre-commit hook updates, running every midnight (```pre-commit-update.yaml```) 
+- Automated pre-commit hook updates, running every midnight (```pre-commit-update.yaml```)
 - Check if more is added! ##CHECK
 
 An example of a triggered workflow can be seen here: https://github.com/s241646/cds_predictor/blob/main/.github/workflows/tests.yaml
@@ -329,7 +329,7 @@ Since the ```pre-commit-config.yaml``` workflow file is not automatically update
 >
 > Answer:
 
-We configured experiments by using Hydra config files in the train script. The hyperparameters (batch size, learning rate, scheduler, architecture) are defined in confgis/config.yaml. They can be overwritten from the command line, and integrated with hyperparameter sweeps. 
+We configured experiments by using Hydra config files in the train script. The hyperparameters (batch size, learning rate, scheduler, architecture) are defined in confgis/config.yaml. They can be overwritten from the command line, and integrated with hyperparameter sweeps.
 
 ### Question 13
 
@@ -348,7 +348,7 @@ The hydro config files were version-controlled (git) and logged to the timestamp
 ```
 python train.py +wandb_run_id=<run_id>
 ```
-, or reuse the config file. 
+, or reuse the config file.
 
 ### Question 14
 
@@ -366,13 +366,13 @@ python train.py +wandb_run_id=<run_id>
 > Answer:
 
 We tracked and visualized experiments in Weights & Biases, as well as analyzing sweeps.
-We track training and validation loss and accuracy during training, to determine model convergence, overfitting and generalization. A model that does well should decrease validation loss and have increasing validation accuracy. 
+We track training and validation loss and accuracy during training, to determine model convergence, overfitting and generalization. A model that does well should decrease validation loss and have increasing validation accuracy.
 <img width="1391" height="739" alt="image" src="https://github.com/user-attachments/assets/5f65ec72-8b57-4681-a13c-b521d537f72d" />
 
 
 The next image shows the parameter importance of the most useful parameter.
 <img width="709" height="335" alt="image" src="https://github.com/user-attachments/assets/30db04af-2b99-4420-a316-5d2491d077b0" />
-From our sweeps, we could infer that learning rate is strongly positvely correlated with train accuracy, while dropout has a negative correlation. This was useful in priotizing impactful hyperparameters. 
+From our sweeps, we could infer that learning rate is strongly positvely correlated with train accuracy, while dropout has a negative correlation. This was useful in priotizing impactful hyperparameters.
 
 <img width="1058" height="299" alt="image" src="https://github.com/user-attachments/assets/652a813e-2bf2-4d5c-88eb-ecb423c8ace9" />
 The image above shows the saving of model checkpoints, which are ready to be reused in the API for example. Artifacts are linked to the model registry
