@@ -240,7 +240,14 @@ The data tests validate raw and processed datasets, including CSV consistency an
 >
 > Answer:
 
---- question 8 fill here ---
+The total code coverage can be calculated manually by running 
+```
+uv run coverage run --omit="*/_remote_module_non_scriptable.py" -m pytest tests/
+uv run coverage report -m > reports/coverage.txt
+```
+, and also is automatically calculated when pushes are made to main. The coverage report is available as an artifact and linked as URL in the workflow run under 'Upload coverage artifact'. 
+
+The total code coverage of our code is 86%, which includes all our source files. Coverage is high overall, but some gaps remain, particularly in data.py and model.py, where certain branches and edge cases are not tested. While high coverage increases confidence in the correctness of the code, even 100% coverage would not guarantee it is completely error-free. Code coverage only measures which lines are executed during tests, not whether the logic is correct and bugs can still exist. If the tests do not cover all edge cases, the coverage is also irrepresentative of the code's performance. Therefore, while coverage is a valuable metric, it should be complemented with code reviews and further testing to ensure robust and reliable code. 
 
 ### Question 9
 
@@ -301,6 +308,10 @@ Our continuous integration setup can be seen in ```./.github/workflows/```. Spec
 - Check if more is added! ##CHECK
 
 An example of a triggered workflow can be seen here: https://github.com/s241646/cds_predictor/blob/main/.github/workflows/tests.yaml
+
+add:
+Since the pre-commit_config workflow file is not automatically updated by Dependabot, we've created update_pre_commit.yaml, that automatically updates the workflow at midnight and creates a PR if there are any changes to the pre-commit hooks. The workflow can be found here: https://github.com/s241646/cds_predictor/actions/workflows/pre-commit-update.yaml, and uses https://github.com/peter-evans/create-pull-request
+
 
 ## Running code and tracking experiments
 
