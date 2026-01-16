@@ -21,9 +21,15 @@ jobs:
       - name: Install dependencies
         run: uv sync
       - name: Configure DVC credentials
+        env:
+          GCP_SA_KEY_B64: ${{ secrets.GCP_SA_KEY_B64 }}
         run: |
+          if [ -z "$GCP_SA_KEY_B64" ]; then
+            echo "GCP_SA_KEY_B64 secret is missing"
+            exit 1
+          fi
           mkdir -p .dvc
-          printf '%s' "${{ secrets.GCP_SA_KEY }}" > .dvc/gcp-sa-key.json
+          echo "$GCP_SA_KEY_B64" | base64 -d > .dvc/gcp-sa-key.json
           chmod 600 .dvc/gcp-sa-key.json
       - name: Pull data with DVC
         run: uv run dvc pull
