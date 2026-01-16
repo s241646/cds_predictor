@@ -29,10 +29,10 @@ jobs:
           python-version: "3.12"
 
       - name: Run pre-commit autoupdate
-        run: uv run pre-commit autoupdate || true
+        run: uv run pre-commit autoupdate --exclude .github/workflows || true
 
       - name: Run pre-commit (apply fixes)
-        run: uv run pre-commit run --all-files || true
+        run: uv run pre-commit run --all-files --exclude .github/workflows || true
 
       - name: Commit and push changes to a branch
         env:
