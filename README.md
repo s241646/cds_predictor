@@ -132,7 +132,10 @@ coverage report -m
 ```
 
 ## Autoupdate workflow files manually
-Github Actions cannot autoupdate workflow files. Run the following to do it manually:
+Github Actions cannot autoupdate workflow files. At midnight, a PR with changes to the pre-commit workflow is created. 
+The workflow to create these PRs can be manually triggered in Github Actions > Pre-commit auto-update > Run Workflow > choose branch.
+
+You can also run the following in the terminal to do it manually:
 ```
 pre-commit autoupdate
 git checkout -b pre-commit-autoupdate-xxxx
