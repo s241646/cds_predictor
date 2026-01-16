@@ -25,6 +25,6 @@ jobs:
       - name: Install dependencies
         run: uv sync
       - name: Pull data with DVC
-        run: uv run dvc pull
+        run: uv run dvc pull --force
       - name: Quick data check
         run: uv run python -c "from cds_repository.data import get_dataloaders; get_dataloaders(batch_size=4)"
