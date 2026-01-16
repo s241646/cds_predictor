@@ -91,7 +91,9 @@ def tensorboard(ctx: Context, logdir: str = "logs") -> None:
 @task
 def test(ctx: Context) -> None:
     """Run tests."""
-    ctx.run("uv run coverage run -m pytest tests/", echo=True, pty=not WINDOWS)
+    ctx.run(
+        'uv run coverage run --omit="*/_remote_module_non_scriptable.py" -m pytest tests/', echo=True, pty=not WINDOWS
+    )
     ctx.run("uv run coverage report -m -i", echo=True, pty=not WINDOWS)
 
 
