@@ -330,7 +330,7 @@ Since the pre-commit_config workflow file is not automatically updated by Depend
 >
 > Answer:
 
---- question 12 fill here ---
+We configured experiments by using Hydra config files in the train script. The hyperparameters (batch size, learning rate, scheduler, architecture) are defined in confgis/config.yaml. They can be overwritten from the command line, and integrated with hyperparameter sweeps. 
 
 ### Question 13
 
@@ -345,7 +345,11 @@ Since the pre-commit_config workflow file is not automatically updated by Depend
 >
 > Answer:
 
---- question 13 fill here ---
+The hydro config files were version-controlled (git) and logged to the timestamped folder. Each log stores the exact configuration used. We fixed randomseeds everywhere (to 42). The experiments hyperparameters, metrics and best model artifacts are tracked in Weights & Biases. To rerun past experiments (with access to the W&B team) run
+```
+python train.py +wandb_run_id=<run_id>
+```
+, or reuse the config file. 
 
 ### Question 14
 
@@ -362,7 +366,19 @@ Since the pre-commit_config workflow file is not automatically updated by Depend
 >
 > Answer:
 
---- question 14 fill here ---
+We tracked and visualized experiments in Weights & Biases, as well as analyzing sweeps.
+We track training and validation loss and accuracy during training, to determine model convergence, overfitting and generalization. A model that does well should decrease validation loss and have increasing validation accuracy. 
+<img width="1391" height="739" alt="image" src="https://github.com/user-attachments/assets/5f65ec72-8b57-4681-a13c-b521d537f72d" />
+
+
+The next image shows the parameter importance of the most useful parameter.
+<img width="709" height="335" alt="image" src="https://github.com/user-attachments/assets/30db04af-2b99-4420-a316-5d2491d077b0" />
+From our sweeps, we could infer that learning rate is strongly positvely correlated with train accuracy, while dropout has a negative correlation. This was useful in priotizing impactful hyperparameters. 
+
+<img width="1058" height="299" alt="image" src="https://github.com/user-attachments/assets/652a813e-2bf2-4d5c-88eb-ecb423c8ace9" />
+The image above shows the saving of model checkpoints, which are ready to be reused in the API for example. Artifacts are linked to the model registry
+
+Together, these metrics and visualizations provide a comprehensive view of model performance, stability, and reproducibility across experiments.
 
 ### Question 15
 
