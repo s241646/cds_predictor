@@ -2,4 +2,4 @@
     remote = gcpremote
 ['remote "gcpremote"']
     url = gs://cds-predictor/dvc
-    credentialpath = gcp-sa-key.json
+    credentialpath = .dvc/gcp-sa-key.json

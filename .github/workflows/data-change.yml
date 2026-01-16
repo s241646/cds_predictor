@@ -20,5 +20,18 @@ jobs:
           python-version: "3.12"
       - name: Install dependencies
         run: uv sync
+      - name: Configure DVC credentials
+        env:
+          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+        run: |
+          if [ -z "$GCP_SA_KEY" ]; then
+            echo "GCP_SA_KEY secret is missing"
+            exit 1
+          fi
+          mkdir -p .dvc
+          printf '%s' "$GCP_SA_KEY" > .dvc/gcp-sa-key.json
+          chmod 600 .dvc/gcp-sa-key.json
+      - name: Pull data with DVC
+        run: uv run dvc pull
       - name: Quick data check
         run: uv run python -c "from cds_repository.data import get_dataloaders; get_dataloaders(batch_size=4)"
