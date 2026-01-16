@@ -10,6 +10,9 @@ def preprocess_fasta(seq_dict: dict, max_length: int | None = None) -> None:
         max_length: Maximum sequence length. If None, uses the longest sequence.
                    Sequences shorter than this will be padded with zeros.
     """
+    # Check for empty sequence dictionary
+    if not seq_dict:
+        raise ValueError("seq_dict cannot be empty")
 
     # Determine max_length if not provided
     if max_length is None:
@@ -55,7 +58,7 @@ def preprocess_fasta(seq_dict: dict, max_length: int | None = None) -> None:
     df_encoded.insert(0, "seq_id", list(seq_dict.keys()))
 
     # Save to CSV (matching the format from CDSDataset.save())
-    df_encoded.to_csv("../../data/tmp/preprocessed.csv.gz", index=False, compression="gzip")
+    df_encoded.to_csv("data/tmp/test.csv.gz", index=False, compression="gzip")
 
 
 def main() -> None:
