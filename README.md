@@ -130,3 +130,12 @@ WANDB_ENTITY=mlops_group42
 coverage run --omit="*/_remote_module_non_scriptable.py" -m pytest
 coverage report -m
 ```
+
+## Autoupdate workflow files manually
+Github Actions cannot autoupdate workflow files. Run the following to do it manually:
+```
+pre-commit autoupdate
+git checkout -b pre-commit-autoupdate-xxxx
+git commit -am "chore: pre-commit autoupdate"
+git push origin pre-commit-autoupdate-xxxx
+```
