@@ -168,7 +168,7 @@ s241646, sXXXXXX, sXXXXXX, sXXXXXX
 >
 > Answer:
 
-We used **uv** for managing our project dependencies. All required packages and their versions are tracked in the **uv.lock** file. To set up a new environment, clone the repository, install **uv** (https://docs.astral.sh/uv/getting-started/installation/), and then run **uv sync**. This command reads the **uv.lock** file and installs all dependencies as specified, ensuring an identical environment. When adding or updating packages, we use **uv add <package>**, which updates the lock file. 
+We used **uv** for managing our project dependencies. All required packages and their versions are tracked in the **uv.lock** file. To set up a new environment, clone the repository, install **uv** (https://docs.astral.sh/uv/getting-started/installation/), and then run **uv sync**. This command reads the **uv.lock** file and installs all dependencies as specified, ensuring an identical environment. When adding or updating packages, we use **uv add <package>**, which updates the lock file.
 
 ### Question 5
 
@@ -251,7 +251,7 @@ The data tests validate raw and processed datasets, including CSV consistency an
 >
 > Answer:
 
-We used branches and PRs in our project. In our group, we used branches for adding new features. Each feature was developed separately on a branch, instead of the main branch. Most of the time one member worked on a branch, but other times a member could easily pick up another one's branch. 
+We used branches and PRs in our project. In our group, we used branches for adding new features. Each feature was developed separately on a branch, instead of the main branch. Most of the time one member worked on a branch, but other times a member could easily pick up another one's branch.
 
 Once a feature or fix is complete, we created PRs to merge to main, with a short description of the changes / new feature. Most of the time other members reviewed the PRs (sometimes in person), to catch any issues before affecting other code. For changes to the README we directly committed to main. Overall, using branches and PRs helped keep our codebase organized and reduced merge conflicts, as well as be able to trace back to early versions, if needed.
 
