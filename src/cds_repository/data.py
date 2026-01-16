@@ -177,7 +177,7 @@ def load_dataloader(
 
 
 def get_dataloaders(
-    data_path: str | Path = "data/processed",
+    data_path: str | Path = "data/processed/training",
     batch_size: int = 32,
     num_workers: int = 0,
 ) -> tuple[DataLoader, DataLoader]:
