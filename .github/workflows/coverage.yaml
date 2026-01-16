@@ -1,4 +1,4 @@
-name: Code Coverage
+name: Calculate and Report Code Coverage
 
 on:
   push:
