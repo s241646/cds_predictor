@@ -1,13 +1,13 @@
 # Global training configuration for Hydra
 hyperparameters:
   batch_size: 64
-  learning_rate: 3e-4
+  learning_rate: 5e-4
 
 epochs: 30
 lr: ${hyperparameters.learning_rate}
 weight_decay: 0.01
 save_dir: "models"
-save_name: "cdr_predict_cnn.pt"
+save_name: "cdr_predict_cnn.ckpt"
 patience: 5
 use_scheduler: true
 scheduler_factor: 0.5
@@ -15,7 +15,7 @@ scheduler_patience: 2
 in_channels: 4
 channels: [64, 128, 256]
 kernel_sizes: [7, 5, 3]
-dropout: 0.2
+dropout: 0.1
 log_dir: "logs"
 tensorboard: true
 num_workers: 0

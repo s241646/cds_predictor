@@ -14,24 +14,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
       - name: Setup uv
         uses: astral-sh/setup-uv@v7
         with:
           python-version: "3.12"
       - name: Install dependencies
         run: uv sync
-      - name: Configure DVC credentials
-        env:
-          GCP_SA_KEY_B64: ${{ secrets.GCP_SA_KEY_B64 }}
-        run: |
-          if [ -z "$GCP_SA_KEY_B64" ]; then
-            echo "GCP_SA_KEY_B64 secret is missing"
-            exit 1
-          fi
-          mkdir -p .dvc
-          echo "$GCP_SA_KEY_B64" | base64 -d > .dvc/gcp-sa-key.json
-          chmod 600 .dvc/gcp-sa-key.json
       - name: Pull data with DVC
-        run: uv run dvc pull
+        run: uv run dvc pull --force
       - name: Quick data check
         run: uv run python -c "from cds_repository.data import get_dataloaders; get_dataloaders(batch_size=4)"

@@ -70,7 +70,7 @@ will check the repositories and the code to verify your answers.
 * [x] Used Hydra to load the configurations and manage your hyperparameters (M11)
 * [x] Use profiling to optimize your code (M12)
 * [x] Use logging to log important events in your code (M14)
-* [ ] Use Weights & Biases to log training progress and other important metrics/artifacts in your code (M14) [in progress]
+* [x] Use Weights & Biases to log training progress and other important metrics/artifacts in your code (M14)
 * [x] Consider running a hyperparameter optimization sweep (M14)
 * [x] Use PyTorch-lightning (if applicable) to reduce the amount of boilerplate in your code (M15)
 
@@ -78,11 +78,11 @@ will check the repositories and the code to verify your answers.
 
 * [x] Write unit tests related to the data part of your code (M16)
 * [x] Write unit tests related to model construction and or model training (M16)
-* [ ] Calculate the code coverage (M16)
-* [ ] Get some continuous integration running on the GitHub repository (M17)
-* [ ] Add caching and multi-os/python/pytorch testing to your continuous integration (M17)
-* [ ] Add a linting step to your continuous integration (M17)
-* [ ] Add pre-commit hooks to your version control setup (M18)
+* [x] Calculate the code coverage (M16)
+* [x] Get some continuous integration running on the GitHub repository (M17)
+* [x] Add caching and multi-os/python/pytorch testing to your continuous integration (M17)
+* [x] Add a linting step to your continuous integration (M17)
+* [x] Add pre-commit hooks to your version control setup (M18)
 * [x] Add a continues workflow that triggers when data changes (M19)
 * [x] Add a continues workflow that triggers when changes to the model registry is made (M19)
 * [x] Create a data storage in GCP Bucket for your data and link this with your data version control setup (M21)
@@ -134,7 +134,7 @@ Group 42
 >
 > Answer:
 
-s241646, sXXXXXX, sXXXXXX, sXXXXXX
+s241646, s184339, s253771, s260422
 
 ### Question 3
 > **Did you end up using any open-source frameworks/packages not covered in the course during your project? If so**
@@ -168,7 +168,7 @@ s241646, sXXXXXX, sXXXXXX, sXXXXXX
 >
 > Answer:
 
-We used **uv** for managing our project dependencies. All required packages and their versions are tracked in the **uv.lock** file. To set up a new environment, clone the repository, install **uv** (https://docs.astral.sh/uv/getting-started/installation/), and then run **uv sync**. This command reads the **uv.lock** file and installs all dependencies as specified, ensuring an identical environment. When adding or updating packages, we use **uv add <package>**, which updates the lock file. 
+We used **uv** for managing our project dependencies. All required packages and their versions are tracked in the **uv.lock** file. To set up a new environment, clone the repository, install **uv** (https://docs.astral.sh/uv/getting-started/installation/), and then run **uv sync**. This command reads the **uv.lock** file and installs all dependencies as specified, ensuring an identical environment. When adding or updating packages, we use **uv add <package>**, which updates the lock file.
 
 ### Question 5
 
@@ -199,7 +199,11 @@ We used **uv** for managing our project dependencies. All required packages and 
 >
 > Answer:
 
---- question 6 fill here ---
+We use pre-commit hooks to automatically run checks before code is committed, ensuring consistent standards across the team during the project. For linting and code quality, we use Ruff, which helps catch common bugs, unused code, and style issues. For formatting, we used on Ruff Format, which ensures consistent code style with formatting rules which are enforced via pre-commit-hooks, for example removing trailing whitespace and ensuring files end with a newlines.
+
+Ruff provides lightweight type checks that improve code correctness. Documentation is supported through well-structured README files, which explain the project structure and usage.
+
+These rules and formalities matter in larger projects because many developers work on the same codebase over long periods of time. Consistent formatting and linting reduce code conflicts and bugs, and good documentation makes it easier for new developers to understand the codebase, contribute and improves maintainability.
 
 ## Version control
 
@@ -236,7 +240,14 @@ The data tests validate raw and processed datasets, including CSV consistency an
 >
 > Answer:
 
---- question 8 fill here ---
+The total code coverage can be calculated manually by running 
+```
+uv run coverage run --omit="*/_remote_module_non_scriptable.py" -m pytest tests/
+uv run coverage report -m > reports/coverage.txt
+```
+, and also is automatically calculated when pushes are made to main. The coverage report is available as an artifact and linked as URL in the workflow run under 'Upload coverage artifact'. 
+
+The total code coverage of our code is 86%, which includes all our source files. Coverage is high overall, but some gaps remain, particularly in data.py and model.py, where certain branches and edge cases are not tested. While high coverage increases confidence in the correctness of the code, even 100% coverage would not guarantee it is completely error-free. Code coverage only measures which lines are executed during tests, not whether the logic is correct and bugs can still exist. If the tests do not cover all edge cases, the coverage is also irrepresentative of the code's performance. Therefore, while coverage is a valuable metric, it should be complemented with code reviews and further testing to ensure robust and reliable code. 
 
 ### Question 9
 
@@ -251,7 +262,7 @@ The data tests validate raw and processed datasets, including CSV consistency an
 >
 > Answer:
 
-We used branches and PRs in our project. In our group, we used branches for adding new features. Each feature was developed separately on a branch, instead of the main branch. Most of the time one member worked on a branch, but other times a member could easily pick up another one's branch. 
+We used branches and PRs in our project. In our group, we used branches for adding new features. Each feature was developed separately on a branch, instead of the main branch. Most of the time one member worked on a branch, but other times a member could easily pick up another one's branch.
 
 Once a feature or fix is complete, we created PRs to merge to main, with a short description of the changes / new feature. Most of the time other members reviewed the PRs (sometimes in person), to catch any issues before affecting other code. For changes to the README we directly committed to main. Overall, using branches and PRs helped keep our codebase organized and reduced merge conflicts, as well as be able to trace back to early versions, if needed.
 
@@ -273,7 +284,7 @@ Once a feature or fix is complete, we created PRs to merge to main, with a short
 ### Question 11
 
 > **Discuss you continuous integration setup. What kind of continuous integration are you running (unittesting,**
-> **linting, etc.)? Do you test multiple operating systems, Python  version etc. Do you make use of caching? Feel free**
+> **linting, etc.)? Do you test multiple operating systems, Python version etc. Do you make use of caching? Feel free**
 > **to insert a link to one of your GitHub actions workflow.**
 >
 > Recommended answer length: 200-300 words.
@@ -285,7 +296,21 @@ Once a feature or fix is complete, we created PRs to merge to main, with a short
 >
 > Answer:
 
---- question 11 fill here ---
+For our continuous integration setup, we are running both unit tests and linting. We have defined multiple unit tests, and in our continuous integration pipeline we teston macOS, Ubuntu, and Windows. For all operative systems, we test Python versions 3.12 and 3.13. In addition, we test different PyTorch versions (2.5.0, 2.6.0, 2.7.0) on Ubuntu with both Python versions 3.12 and 3.13 to ensure compatability across our supported PyTorch range. 
+
+We make use of caching, though this is not explicitly visible in the workflow .yaml files. The setup-uv action (astral-sh/setup-uv@v7) has built-in caching that stores both the uv tool itself and the installed Python packages, speeding up our continuous integration runs.
+
+Our continuous integration setup can be seen in ```./.github/workflows/```. Specifically, we have organized it into the below separate files: 
+- Unit testing with pytest (```tests.yaml```)
+- Code coverage calculation on Ubuntu with Python 3.12 (```coverage.yaml```) ##REMOVE?
+- Code linting check with ruff (```linting.yaml```)
+- Automated pre-commit hook updates, running every midnight (```pre-commit-update.yaml```) 
+- Check if more is added! ##CHECK
+
+An example of a triggered workflow can be seen here: https://github.com/s241646/cds_predictor/blob/main/.github/workflows/tests.yaml
+
+Since the ```pre-commit-config.yaml``` workflow file is not automatically updated by Dependabot, we've created ```pre-commit-update.yaml```, that automatically updates the workflow at midnight and creates a PR if there are any changes to the pre-commit hooks. The workflow can be found here: https://github.com/s241646/cds_predictor/actions/workflows/pre-commit-update.yaml, and uses https://github.com/peter-evans/create-pull-request
+
 
 ## Running code and tracking experiments
 
@@ -304,7 +329,7 @@ Once a feature or fix is complete, we created PRs to merge to main, with a short
 >
 > Answer:
 
---- question 12 fill here ---
+We configured experiments by using Hydra config files in the train script. The hyperparameters (batch size, learning rate, scheduler, architecture) are defined in confgis/config.yaml. They can be overwritten from the command line, and integrated with hyperparameter sweeps. 
 
 ### Question 13
 
@@ -319,7 +344,11 @@ Once a feature or fix is complete, we created PRs to merge to main, with a short
 >
 > Answer:
 
---- question 13 fill here ---
+The hydro config files were version-controlled (git) and logged to the timestamped folder. Each log stores the exact configuration used. We fixed randomseeds everywhere (to 42). The experiments hyperparameters, metrics and best model artifacts are tracked in Weights & Biases. To rerun past experiments (with access to the W&B team) run
+```
+python train.py +wandb_run_id=<run_id>
+```
+, or reuse the config file. 
 
 ### Question 14
 
@@ -336,7 +365,19 @@ Once a feature or fix is complete, we created PRs to merge to main, with a short
 >
 > Answer:
 
---- question 14 fill here ---
+We tracked and visualized experiments in Weights & Biases, as well as analyzing sweeps.
+We track training and validation loss and accuracy during training, to determine model convergence, overfitting and generalization. A model that does well should decrease validation loss and have increasing validation accuracy. 
+<img width="1391" height="739" alt="image" src="https://github.com/user-attachments/assets/5f65ec72-8b57-4681-a13c-b521d537f72d" />
+
+
+The next image shows the parameter importance of the most useful parameter.
+<img width="709" height="335" alt="image" src="https://github.com/user-attachments/assets/30db04af-2b99-4420-a316-5d2491d077b0" />
+From our sweeps, we could infer that learning rate is strongly positvely correlated with train accuracy, while dropout has a negative correlation. This was useful in priotizing impactful hyperparameters. 
+
+<img width="1058" height="299" alt="image" src="https://github.com/user-attachments/assets/652a813e-2bf2-4d5c-88eb-ecb423c8ace9" />
+The image above shows the saving of model checkpoints, which are ready to be reused in the API for example. Artifacts are linked to the model registry
+
+Together, these metrics and visualizations provide a comprehensive view of model performance, stability, and reproducibility across experiments.
 
 ### Question 15
 

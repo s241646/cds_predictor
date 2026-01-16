@@ -3,13 +3,9 @@
 name: Pre-commit auto-update
 
 on:
-  push:
-    branches:
-      - main
-
-  pull_request:
-    branches:
-      - main
+  schedule:
+    - cron: "0 0 * * *" # every day at midnight UTC
+  workflow_dispatch: {} # manual triggering
 
 permissions:
   contents: write
@@ -22,6 +18,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup uv
         uses: astral-sh/setup-uv@v7
@@ -34,17 +32,14 @@ jobs:
       - name: Run pre-commit (apply fixes)
         run: uv run pre-commit run --all-files || true
 
-      - name: Commit and push changes to a branch
-        env:
-          BRANCH: pre-commit-autoupdate-${{ github.run_id }}
-        run: |
-          git config user.name "${{ github.actor }}"
-          git config user.email "${{ github.actor }}@users.noreply.github.com"
-          if git diff --quiet; then
-            echo "No changes to commit"
-            exit 0
-          fi
-          git add -A
-          git commit -m "chore: pre-commit autoupdate and fixes"
-          git checkout -b "$BRANCH"
-          git push --set-upstream origin "$BRANCH"
+      - name: Create pull request
+        uses: peter-evans/create-pull-request@v6 # create a PR if there are changes
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: update/pre-commit-autoupdate
+          delete-branch: true
+          title: Auto-update pre-commit hooks
+          commit-message: Auto-update pre-commit hooks
+          body: |
+            Update versions of tools in pre-commit configs to latest version.
+          labels: dependencies

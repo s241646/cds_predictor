@@ -25,10 +25,10 @@ def test_training_learns_on_processed_data(processed_dataloaders):
 
     metrics = trainer.callback_metrics
 
-    train_loss = metrics["train/loss_epoch"].item()
-    train_acc = metrics["train/acc_epoch"].item()
-    val_loss = metrics["val/loss"].item()
-    val_acc = metrics["val/acc"].item()
+    train_loss = metrics["train_loss_epoch"].item()
+    train_acc = metrics["train_acc_epoch"].item()
+    val_loss = metrics["val_loss"].item()
+    val_acc = metrics["val_acc"].item()
 
     assert train_loss < 0.7
     assert val_loss < 0.7
