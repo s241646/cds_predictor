@@ -13,10 +13,6 @@ import wandb
 from cds_repository.model import MotifCNNModule
 from cds_repository.data import get_dataloaders
 import hydra
-import os
-
-wandb.login(key=os.environ["WANDB_API_KEY"])
-wandb.init(project=os.environ["WANDB_PROJECT"], entity=os.environ["WANDB_ENTITY"])
 
 
 def get_device() -> torch.device:
