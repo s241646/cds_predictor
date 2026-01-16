@@ -126,16 +126,16 @@ class MotifCNNModule(pl.LightningModule):
         x, y = batch
         logits = self(x)
         loss = self.criterion(logits, y)
-        self.log("train/loss", loss, on_step=True, on_epoch=True, prog_bar=True)
-        self.log("train/acc", self._acc(logits, y), on_step=True, on_epoch=True, prog_bar=True)
+        self.log("train_loss", loss, on_step=True, on_epoch=True, prog_bar=True)
+        self.log("train_acc", self._acc(logits, y), on_step=True, on_epoch=True, prog_bar=True)
         return loss
 
     def validation_step(self, batch: tuple[torch.Tensor, torch.Tensor], batch_idx: int) -> None:
         x, y = batch
         logits = self(x)
         loss = self.criterion(logits, y)
-        self.log("val/loss", loss, on_epoch=True, prog_bar=True)
-        self.log("val/acc", self._acc(logits, y), on_epoch=True, prog_bar=True)
+        self.log("val_loss", loss, on_epoch=True, prog_bar=True)
+        self.log("val_acc", self._acc(logits, y), on_epoch=True, prog_bar=True)
 
     def test_step(self, batch, batch_idx: int) -> None:
         x, y = batch
@@ -146,8 +146,8 @@ class MotifCNNModule(pl.LightningModule):
         loss = self.criterion(logits, y)
         acc = self._acc(logits, y)
 
-        self.log("test/loss", loss, on_step=False, on_epoch=True)
-        self.log("test/acc", acc, on_step=False, on_epoch=True)
+        self.log("test_loss", loss, on_step=False, on_epoch=True)
+        self.log("test_acc", acc, on_step=False, on_epoch=True)
 
         return {"loss": loss, "acc": acc}
 
@@ -161,7 +161,7 @@ class MotifCNNModule(pl.LightningModule):
                 "optimizer": opt,
                 "lr_scheduler": {
                     "scheduler": scheduler,
-                    "monitor": "val/loss",
+                    "monitor": "val_loss",
                     "interval": "epoch",
                     "frequency": 1,
                 },
