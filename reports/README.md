@@ -304,13 +304,12 @@ Our continuous integration setup can be seen in ```./.github/workflows/```. Spec
 - Unit testing with pytest (```tests.yaml```)
 - Code coverage calculation on Ubuntu with Python 3.12 (```coverage.yaml```) ##REMOVE?
 - Code linting check with ruff (```linting.yaml```)
-- Automated pre-commit hook updates, running every midnight (```pre-commit-update.yaml```) ##CHECK; IS THIS CORRECT?
+- Automated pre-commit hook updates, running every midnight (```pre-commit-update.yaml```) 
 - Check if more is added! ##CHECK
 
 An example of a triggered workflow can be seen here: https://github.com/s241646/cds_predictor/blob/main/.github/workflows/tests.yaml
 
-add:
-Since the pre-commit_config workflow file is not automatically updated by Dependabot, we've created update_pre_commit.yaml, that automatically updates the workflow at midnight and creates a PR if there are any changes to the pre-commit hooks. The workflow can be found here: https://github.com/s241646/cds_predictor/actions/workflows/pre-commit-update.yaml, and uses https://github.com/peter-evans/create-pull-request
+Since the ```pre-commit-config.yaml``` workflow file is not automatically updated by Dependabot, we've created ```pre-commit-update.yaml```, that automatically updates the workflow at midnight and creates a PR if there are any changes to the pre-commit hooks. The workflow can be found here: https://github.com/s241646/cds_predictor/actions/workflows/pre-commit-update.yaml, and uses https://github.com/peter-evans/create-pull-request
 
 
 ## Running code and tracking experiments
