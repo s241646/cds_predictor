@@ -114,7 +114,7 @@ class CDSDataset(Dataset):
         # Create dataframe with encoded positions
         max_length = len(sequence_data[0])
         nucleotides = ["A", "T", "C", "G"]
-        columns = [f"pos_{i//4}_{nucleotides[i%4]}" for i in range(max_length)]
+        columns = [f"pos_{i // 4}_{nucleotides[i % 4]}" for i in range(max_length)]
         df_encoded = pd.DataFrame(sequence_data, columns=columns)
         df_encoded["label"] = df_processed["label"].values
 
