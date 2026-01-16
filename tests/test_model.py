@@ -98,6 +98,6 @@ def test_configure_optimizers_returns_expected():
 
     assert "optimizer" in config, "Optimizer config missing 'optimizer' key"
     assert "lr_scheduler" in config, "Optimizer config missing 'lr_scheduler' key"
-    assert isinstance(
-        config["optimizer"], torch.optim.Optimizer
-    ), "'optimizer' is not an instance of torch.optim.Optimizer"
+    assert isinstance(config["optimizer"], torch.optim.Optimizer), (
+        "'optimizer' is not an instance of torch.optim.Optimizer"
+    )
