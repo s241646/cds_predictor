@@ -1,3 +1,5 @@
+.github/workflows/*_backup.yaml
+
 docs/site/
 
 # test cache

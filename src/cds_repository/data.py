@@ -141,6 +141,7 @@ def load_dataset(data_path: Path, split: str = "train") -> CDSDataset:
         raise ValueError(msg)
 
     file_path = Path(data_path) / f"{split}.csv.gz"
+    print(file_path)
     if not file_path.exists():
         msg = f"File not found: {file_path}"
         raise FileNotFoundError(msg)
@@ -177,7 +178,7 @@ def load_dataloader(
 
 
 def get_dataloaders(
-    data_path: str | Path = "data/processed",
+    data_path: str | Path = "data/training/processed",
     batch_size: int = 32,
     num_workers: int = 0,
 ) -> tuple[DataLoader, DataLoader]:

@@ -6,8 +6,8 @@ from cds_repository.data import CDSDataset, load_dataset
 from tests import _PATH_DATA
 from pathlib import Path
 
-RAW_PATH = Path(_PATH_DATA + "/raw")
-PROCESSED_PATH = Path(_PATH_DATA + "/processed")
+RAW_PATH = Path(_PATH_DATA + "/raw/training")
+PROCESSED_PATH = Path(_PATH_DATA + "/processed/training")
 
 # ------------------------
 # RAW DATA TESTS
