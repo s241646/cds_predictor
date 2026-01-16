@@ -58,7 +58,7 @@ def preprocess_fasta(seq_dict: dict, max_length: int | None = None) -> None:
     df_encoded.insert(0, "seq_id", list(seq_dict.keys()))
 
     # Save to CSV (matching the format from CDSDataset.save())
-    df_encoded.to_csv("../../data/tmp/preprocessed.csv.gz", index=False, compression="gzip")
+    df_encoded.to_csv("data/tmp/preprocessed.csv.gz", index=False, compression="gzip")
 
 
 def main() -> None:
