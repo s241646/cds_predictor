@@ -32,6 +32,7 @@ gcloud run deploy cds-api \
   --image "$IMAGE" \
   --region europe-west1 \
   --platform managed \
+  --port 8000 \
   --allow-unauthenticated
 ```
 

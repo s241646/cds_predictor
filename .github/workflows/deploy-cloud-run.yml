@@ -46,4 +46,5 @@ jobs:
             --image "$IMAGE" \
             --region "${{ env.REGION }}" \
             --platform managed \
+            --port 8000 \
             --allow-unauthenticated
