@@ -27,4 +27,11 @@ jobs:
       - name: Pull data with DVC
         run: uv run dvc pull --force
       - name: Quick data check
-        run: uv run python -c "from cds_repository.data import get_dataloaders; get_dataloaders(batch_size=4)"
+        run: |
+          uv run python - <<'PY'
+          from pathlib import Path
+          from cds_repository.data import get_dataloaders
+
+          data_path = "data/processed/training" if Path("data/processed/training").exists() else "data/training/processed"
+          get_dataloaders(data_path=data_path, batch_size=4)
+          PY
