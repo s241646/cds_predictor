@@ -1,17 +1,17 @@
 # CDS predictor in short prokaryotic DNA sequences
 
-## Project description 
-Identification of protein-coding genes and their corresponding coding regions is a well-established task in prokaryotic genomes. Genomic data is typically sequenced into many short DNA fragments called reads. Various methods exist to assemble these reads into longer sequences and to align them to known genomic references. However, assembly is not always possible, requiring alternative approaches to determine whether a sequence is protein-coding and thus functionally relevant. This is frequently the case in metagenomics samples or ancient DNA. 
+## Project description
+Identification of protein-coding genes and their corresponding coding regions is a well-established task in prokaryotic genomes. Genomic data is typically sequenced into many short DNA fragments called reads. Various methods exist to assemble these reads into longer sequences and to align them to known genomic references. However, assembly is not always possible, requiring alternative approaches to determine whether a sequence is protein-coding and thus functionally relevant. This is frequently the case in metagenomics samples or ancient DNA.
 
-The overall goal of this project is to develop and train a model that can predict whether a short DNA sequence belongs to a protein-coding gene or not. Therefore, we frame this as a binary classification task. 
+The overall goal of this project is to develop and train a model that can predict whether a short DNA sequence belongs to a protein-coding gene or not. Therefore, we frame this as a binary classification task.
 
-While more complex problem definitions are required to make it useful for real-world scenarios, this project scope is a step in that direction. 
+While more complex problem definitions are required to make it useful for real-world scenarios, this project scope is a step in that direction.
 
 The dataset we use is a simplified subset of a dataset curated by a group member for another project. The simplified dataset used for this project is placed in ```/data/raw/```. Input sequences are short DNA fragments of 300 nucleotides, with a vocabulary of {A, T, G, C}, labeled as 0 (non-coding) or 1 (coding).
 
-The dataset includes sequences from 8 bacterial genomes. Sequences are partiotioned so that 4 genomes are used for the training set, 2 genomes for the validation set, and 2 genomes for the test set. This ensures that no sequences from the same genome appear in different partitions. One could also split the sequences based on sequence similarity, but this approach is computationally intensive and not related to the scope of the MLOps course. 
+The dataset includes sequences from 8 bacterial genomes. Sequences are partiotioned so that 4 genomes are used for the training set, 2 genomes for the validation set, and 2 genomes for the test set. This ensures that no sequences from the same genome appear in different partitions. One could also split the sequences based on sequence similarity, but this approach is computationally intensive and not related to the scope of the MLOps course.
 
-We are not completely sure what model framework we will end up using, but our plan is to one-hot encode sequences and start with a simple CNN-based architecture. 
+We are not completely sure what model framework we will end up using, but our plan is to one-hot encode sequences and start with a simple CNN-based architecture.
 
 ## Project structure
 
