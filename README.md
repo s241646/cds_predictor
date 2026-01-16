@@ -142,3 +142,5 @@ git checkout -b pre-commit-autoupdate-xxxx
 git commit -am "chore: pre-commit autoupdate"
 git push origin pre-commit-autoupdate-xxxx
 ```
+
+sample push to main
