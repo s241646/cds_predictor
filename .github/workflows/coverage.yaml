@@ -33,6 +33,7 @@ jobs:
         run: |
           uv run coverage run --omit="*/_remote_module_non_scriptable.py" -m pytest tests/
           uv run coverage xml
+          mkdir -p reports
           uv run coverage report -m > reports/coverage.txt
 
       - name: Upload coverage artifact
@@ -42,3 +43,4 @@ jobs:
           path: |
             coverage.xml
             reports/coverage.txt
+          retention-days: 30
