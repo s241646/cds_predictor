@@ -82,7 +82,7 @@ will check the repositories and the code to verify your answers.
 * [x] Get some continuous integration running on the GitHub repository (M17)
 * [x] Add caching and multi-os/python/pytorch testing to your continuous integration (M17)
 * [x] Add a linting step to your continuous integration (M17)
-* [x] Add pre-commit hooks to your version control setup (M18
+* [x] Add pre-commit hooks to your version control setup (M18)
 * [x] Add a continues workflow that triggers when data changes (M19)
 * [x] Add a continues workflow that triggers when changes to the model registry is made (M19)
 * [x] Create a data storage in GCP Bucket for your data and link this with your data version control setup (M21)
@@ -134,7 +134,7 @@ Group 42
 >
 > Answer:
 
-s241646, sXXXXXX, sXXXXXX, sXXXXXX
+s241646, s184339, s253771, s260422
 
 ### Question 3
 > **Did you end up using any open-source frameworks/packages not covered in the course during your project? If so**
@@ -284,7 +284,7 @@ Once a feature or fix is complete, we created PRs to merge to main, with a short
 ### Question 11
 
 > **Discuss you continuous integration setup. What kind of continuous integration are you running (unittesting,**
-> **linting, etc.)? Do you test multiple operating systems, Python  version etc. Do you make use of caching? Feel free**
+> **linting, etc.)? Do you test multiple operating systems, Python version etc. Do you make use of caching? Feel free**
 > **to insert a link to one of your GitHub actions workflow.**
 >
 > Recommended answer length: 200-300 words.
@@ -296,7 +296,18 @@ Once a feature or fix is complete, we created PRs to merge to main, with a short
 >
 > Answer:
 
---- question 11 fill here ---
+For our continuous integration setup, we are running both unit tests and linting. We have defined multiple unit tests, and in our continuous integration pipeline we teston macOS, Ubuntu, and Windows. For all operative systems, we test Python versions 3.12 and 3.13. In addition, we test different PyTorch versions (2.5.0, 2.6.0, 2.7.0) on Ubuntu with both Python versions 3.12 and 3.13 to ensure compatability across our supported PyTorch range. 
+
+We make use of caching, though this is not explicitly visible in the workflow .yaml files. The setup-uv action (astral-sh/setup-uv@v7) has built-in caching that stores both the uv tool itself and the installed Python packages, speeding up our continuous integration runs.
+
+Our continuous integration setup can be seen in ```./.github/workflows/```. Specifically, we have organized it into the below separate files: 
+- Unit testing with pytest (```tests.yaml```)
+- Code coverage calculation on Ubuntu with Python 3.12 (```coverage.yaml```) ##REMOVE?
+- Code linting check with ruff (```linting.yaml```)
+- Automated pre-commit hook updates, running every midnight (```pre-commit-update.yaml```) ##CHECK; IS THIS CORRECT?
+- Check if more is added! ##CHECK
+
+An example of a triggered workflow can be seen here: https://github.com/s241646/cds_predictor/blob/main/.github/workflows/tests.yaml
 
 add:
 Since the pre-commit_config workflow file is not automatically updated by Dependabot, we've created update_pre_commit.yaml, that automatically updates the workflow at midnight and creates a PR if there are any changes to the pre-commit hooks. The workflow can be found here: https://github.com/s241646/cds_predictor/actions/workflows/pre-commit-update.yaml, and uses https://github.com/peter-evans/create-pull-request
