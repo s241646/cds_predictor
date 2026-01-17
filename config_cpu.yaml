@@ -8,10 +8,3 @@ workerPoolSpecs:
         env:
         - name: WANDB_MODE
           value: offline
-        volumeMounts:
-        - name: model-bucket
-          mountPath: /app/models
-    volumes:
-      - name: model-bucket
-        gcs:
-          bucket: cds-predictor
