@@ -6,7 +6,7 @@ hyperparameters:
 epochs: 30
 lr: ${hyperparameters.learning_rate}
 weight_decay: 0.01
-save_dir: "models"
+save_dir: /app/models
 save_name: "cdr_predict_cnn.ckpt"
 patience: 5
 use_scheduler: true
