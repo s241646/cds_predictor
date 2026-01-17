@@ -84,6 +84,9 @@ def main(cfg) -> None:
     # Wandb Logger
     wandb_logger = pl.loggers.WandbLogger(project="cds_predictor", log_model="all")
 
+    Path(cfg.save_dir).mkdir(parents=True, exist_ok=True)
+    logger.info(f"Saving checkpoints to {cfg.save_dir}")
+
     # Callbacks
     checkpoint_callback = ModelCheckpoint(
         monitor="val_loss",
@@ -121,7 +124,8 @@ def main(cfg) -> None:
         artifact.add_file(best_ckpt)
         run = wandb_logger.experiment
         logged_artifact = run.log_artifact(artifact)
-        logged_artifact.wait()
+        if wandb.run is not None and wandb.run.mode != "offline":
+            logged_artifact.wait()
 
     wandb_logger.experiment.finish()
 
