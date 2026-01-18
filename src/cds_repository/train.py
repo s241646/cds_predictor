@@ -13,12 +13,17 @@ import wandb
 from cds_repository.model import MotifCNNModule
 from cds_repository.data import get_dataloaders
 import hydra
+import os
 
 
 def get_device() -> torch.device:
     if torch.backends.mps.is_available():
         return torch.device("mps")
     return torch.device("cpu")
+
+
+def wandb_enabled() -> bool:
+    return "WANDB_MODE" not in os.environ or os.environ.get("WANDB_MODE") != "offline"
 
 
 @dataclass
@@ -81,8 +86,14 @@ def main(cfg) -> None:
         scheduler_patience=cfg.scheduler_patience,
     )
 
-    # Wandb Logger
-    wandb_logger = pl.loggers.WandbLogger(project="cds_predictor", log_model="all")
+    # Wandb Logger if enabled
+    if wandb_enabled():
+        wandb_logger = pl.loggersWandbLogger(
+            project="cds_predictor",
+            log_model="all",
+        )
+    else:
+        wandb_logger = None
 
     Path(cfg.save_dir).mkdir(parents=True, exist_ok=True)
     logger.info(f"Saving checkpoints to {cfg.save_dir}")
@@ -103,7 +114,7 @@ def main(cfg) -> None:
 
     trainer = Trainer(
         max_epochs=cfg.epochs,
-        logger=wandb_logger,
+        logger=wandb_logger,  # none if offline
         callbacks=[checkpoint_callback, early_stopping_callback],
         accelerator="auto",
         # profiler="simple",
@@ -114,7 +125,7 @@ def main(cfg) -> None:
     best_ckpt = checkpoint_callback.best_model_path
     logger.info(f"Best checkpoint path: {best_ckpt}")
 
-    if best_ckpt:
+    if wandb_enabled() and wandb_logger is not None and best_ckpt:
         artifact = wandb.Artifact(
             name="motifcnn",
             type="model",
@@ -124,10 +135,9 @@ def main(cfg) -> None:
         artifact.add_file(best_ckpt)
         run = wandb_logger.experiment
         logged_artifact = run.log_artifact(artifact)
-        if wandb.run is not None and wandb.run.mode != "offline":
-            logged_artifact.wait()
+        logged_artifact.wait()
 
-    wandb_logger.experiment.finish()
+        wandb_logger.experiment.finish()
 
 
 if __name__ == "__main__":
