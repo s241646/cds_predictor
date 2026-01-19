@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import torch
+import json
 import pytorch_lightning as pl
 from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
@@ -127,17 +128,22 @@ def main(cfg) -> None:
         f"Best checkpoint path (Pytorch Lightning): {best_ckpt}(val_loss={checkpoint_callback.best_model_score:.4f})"
     )
 
-    best_ckpt = Path(checkpoint_callback.best_model_path)
+    if best_ckpt:
+        metadata = {
+            "checkpoint_uri": best_ckpt,
+            "val_loss": float(checkpoint_callback.best_model_score),
+        }
 
-    if best_ckpt.exists():
-        stable_path = Path(cfg.save_dir) / "best.ckpt"
-        if stable_path.exists():
-            stable_path.unlink()
-        stable_path.symlink_to(best_ckpt.resolve())
+        meta_path = Path(cfg.save_dir) / "best_model.json"
+        meta_path.write_text(json.dumps(metadata, indent=2))
 
-    logger.info(f"Symlinked best checkpoint to {stable_path}")
+        logger.info(f"Exported best model metadata to {meta_path}")
+
     # load using:
-    # model = MotifCNNModule.load_from_checkpoint("models/best.ckpt")
+    # with open("models/best_model.json") as f:
+    #     meta = json.load(f)
+
+    # model = MotifCNNModule.load_from_checkpoint(meta["checkpoint_uri"])
 
     if wandb_enabled() and wandb_logger is not None and best_ckpt:
         artifact = wandb.Artifact(
