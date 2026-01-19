@@ -88,7 +88,7 @@ def main(cfg) -> None:
 
     # Wandb Logger if enabled
     if wandb_enabled():
-        wandb_logger = pl.loggersWandbLogger(
+        wandb_logger = pl.loggers.WandbLogger(
             project="cds_predictor",
             log_model="all",
         )
@@ -123,7 +123,15 @@ def main(cfg) -> None:
     trainer.fit(model, train_loader, val_loader)
 
     best_ckpt = checkpoint_callback.best_model_path
-    logger.info(f"Best checkpoint path: {best_ckpt}")
+    logger.info(
+        f"Best checkpoint path (Pytorch Lightning): {best_ckpt}(val_loss={checkpoint_callback.best_model_score:.4f})"
+    )
+
+    if best_ckpt:
+        best_model = MotifCNNModule.load_from_checkpoint(best_ckpt)
+        pt_path = Path(cfg.save_dir) / cfg.save_name
+        torch.save(best_model.state_dict(), pt_path)
+        logger.info(f"Saved best model weights to {pt_path}")
 
     if wandb_enabled() and wandb_logger is not None and best_ckpt:
         artifact = wandb.Artifact(
