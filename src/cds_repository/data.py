@@ -109,6 +109,8 @@ class CDSDataset(Dataset):
                     encoded_seq.extend([0, 0, 1, 0])
                 elif nucleotide == "G":
                     encoded_seq.extend([0, 0, 0, 1])
+                elif nucleotide == "N":
+                    encoded_seq.extend([0, 0, 0, 0])  # Unknown nucleotide / padding
             sequence_data.append(encoded_seq)
 
         # Create dataframe with encoded positions
