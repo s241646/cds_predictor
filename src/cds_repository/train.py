@@ -127,11 +127,17 @@ def main(cfg) -> None:
         f"Best checkpoint path (Pytorch Lightning): {best_ckpt}(val_loss={checkpoint_callback.best_model_score:.4f})"
     )
 
-    if best_ckpt:
-        best_model = MotifCNNModule.load_from_checkpoint(best_ckpt)
-        pt_path = Path(cfg.save_dir) / cfg.save_name
-        torch.save(best_model.state_dict(), pt_path)
-        logger.info(f"Saved best model weights to {pt_path}")
+    best_ckpt = Path(checkpoint_callback.best_model_path)
+
+    if best_ckpt.exists():
+        stable_path = Path(cfg.save_dir) / "best.ckpt"
+        if stable_path.exists():
+            stable_path.unlink()
+        stable_path.symlink_to(best_ckpt.resolve())
+
+    logger.info(f"Symlinked best checkpoint to {stable_path}")
+    # load using:
+    # model = MotifCNNModule.load_from_checkpoint("models/best.ckpt")
 
     if wandb_enabled() and wandb_logger is not None and best_ckpt:
         artifact = wandb.Artifact(
