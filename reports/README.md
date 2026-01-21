@@ -424,7 +424,15 @@ Together, these metrics and visualizations provide a comprehensive view of model
 >
 > Answer:
 
---- question 17 fill here ---
+We used the following services: Vertex AI, Cloud Storage, Compute Engine and Cloud Run. 
+Compute Engine is used to create and manage Virtual Machine (VM) instances. We connect to them via SSH and can run training jobs.
+Vertex AI is used to run a custom training jobs on the virtual machines, and monitor its status and logs.
+Cloud Storage is used to store training datasets (integrated wih dvc), model checkpoints from training, container images built via Cloud Build.
+**TO DO** if we used it to store uploaded data?
+Cloud Run is used to deploy the model, allowing us to serve predictions and scale.
+The Artifact Registry is uesd to manage the train and api docker images. They are connected to the github repository and build and push images automatically when there is a change made to main. 
+
+This combination enabled scalable training, reliable data storage, and efficient model deployment.
 
 ### Question 18
 
@@ -439,7 +447,30 @@ Together, these metrics and visualizations provide a comprehensive view of model
 >
 > Answer:
 
---- question 18 fill here ---
+We used Google Compute Engine for running and managing our training infrastructure. Specifically, we created a VM instance ```cds-instance``` for launching and controlling our training jobs.
+
+We start the VMM and connect via SSH after authenticating with ```gcloud```:
+```
+gcloud compute instances start cds-instance
+
+gcloud compute ssh cds-instance
+```
+
+Once connected, we clone our repository, install dependencies, and configure the environment. From this VM, we triggered Vertex AI custom training jobs using the ```gcloud ai custom-jobs create command```. Specifically: 
+```
+gcloud ai custom-jobs create \
+    --region=europe-west1 \
+    --display-name=train-run \
+    --config=config_cpu.yaml \
+```
+
+While the actual training is orchestrated by Vertex AI, Compute Engine provides the compute resources and a stable control point for managing experiments.
+
+The VM we used was an e2-standard-4 instance (4 vCPUs, 16 GB RAM) located in europe-west1-b, with a 100 GB persistent disk. This configuration provided sufficient memory, CPU performance, and storage capacity for heavy preprocessing, model training, and saving checkpoints. The persistent disk allowed us to store intermediate artifacts and model checkpoints reliably during long-running training jobs.
+
+View the progress at GCP: Vertex AI > Model development > Training > Custom jobs
+https://console.cloud.google.com/vertex-ai/training/custom-jobs?project=cds-predictor
+
 
 ### Question 19
 
@@ -449,6 +480,10 @@ Together, these metrics and visualizations provide a comprehensive view of model
 > Answer:
 
 --- question 19 fill here ---
+<img width="1398" height="485" alt="image" src="https://github.com/user-attachments/assets/e479a225-ce8b-4690-a73d-2fa1b4fa3788" />
+<img width="942" height="448" alt="image" src="https://github.com/user-attachments/assets/8234d10c-b02e-4289-a8ca-6338319e943a" />
+
+**TO DO** Add screenshot of input/output data saving
 
 ### Question 20
 
@@ -458,6 +493,9 @@ Together, these metrics and visualizations provide a comprehensive view of model
 > Answer:
 
 --- question 20 fill here ---
+<img width="1288" height="399" alt="image" src="https://github.com/user-attachments/assets/c4e880ac-d8e2-4894-8d34-c95d344041f8" />
+<img width="1326" height="360" alt="image" src="https://github.com/user-attachments/assets/3c561e69-4e78-4672-ae5e-23f386f7361b" />
+
 
 ### Question 21
 
@@ -466,7 +504,8 @@ Together, these metrics and visualizations provide a comprehensive view of model
 >
 > Answer:
 
---- question 21 fill here ---
+<img width="1430" height="504" alt="image" src="https://github.com/user-attachments/assets/41db14b7-6ae5-4bf7-9125-9bbf3b5ab345" />
+
 
 ### Question 22
 
@@ -481,7 +520,11 @@ Together, these metrics and visualizations provide a comprehensive view of model
 >
 > Answer:
 
---- question 22 fill here ---
+We managed to train our model in the cloud using the Compute Engine. We did this by creating a VM instance with sufficient CPU, memory and disk capacity, with Pytorch already installed. We starting it by the terminal or in GCP, and connecting via SSH. The VM was useful because we could use Vertex Ai's logging to track the status of the training job, and intermediate checkpoints and outputs are saved to storage. This set-up enabled reliable and scalable model training, without relying on local hardware. We could submit a job and check back in after a few hours, without worrying about relying on and using resources of our own devices. 
+
+Example seeing jobs on VM:
+<img width="1181" height="268" alt="image" src="https://github.com/user-attachments/assets/629ce729-1c64-479a-91ca-ace7a91c832e" />
+
 
 ## Deployment
 
@@ -564,6 +607,10 @@ Together, these metrics and visualizations provide a comprehensive view of model
 > Answer:
 
 --- question 27 fill here ---
+The largest cost to Josefien was the Compute Engine, followed by Vertex AI, due to the training jobs that were ran there. 
+**TODO** report on actual costs and cost of api / cloud run later
+
+Working on the cloud was frustrating, because it took a while for all the setups between data, model, training, API, inputs/outputs to work. However, once the connections were established it was useful to run long training jobs, and we experienced it was faster to make predictions on the API with the ckpt from the GCP bucket, versus the local checkpoint. It was frustrating at times to manage permission roles, especially when uploading files to the GCP buckets.
 
 ### Question 28
 
