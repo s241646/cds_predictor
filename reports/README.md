@@ -351,6 +351,7 @@ An example of a triggered workflow can be seen here: https://github.com/s241646/
 
 We configured experiments by using Hydra config files in the train script. The hyperparameters (batch size, learning rate, scheduler, architecture) are defined in configs/config.yaml. They can be overwritten from the command line, and integrated with hyperparameter sweeps.
 
+
 ### Question 13
 
 > **Reproducibility of experiments are important. Related to the last question, how did you secure that no information**
@@ -364,7 +365,7 @@ We configured experiments by using Hydra config files in the train script. The h
 >
 > Answer:
 
-The hydro config files were version-controlled (git) and logged to the timestamped folder. Each log stores the exact configuration used. We fixed randomseeds everywhere (to 42). The experiments hyperparameters, metrics and best model artifacts are tracked in Weights & Biases. To rerun past experiments (with access to the W&B team) run
+The hydro config files were version-controlled (git) and logged to the timestamped folder. Each log stores the exact configuration used. We used fixed random seeds everywhere for reproducibility (to 42). The experiments hyperparameters, metrics and best model artifacts are tracked in Weights & Biases. To rerun past experiments (with access to the W&B team), run:
 ```
 python train.py +wandb_run_id=<run_id>
 ```
