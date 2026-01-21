@@ -1,17 +1,18 @@
 import io
 import os
 import time
+import threading
 from uuid import uuid4
 from pathlib import Path
 import fsspec
 import json
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Callable, Awaitable
 from Bio import SeqIO
 
 import torch
 from pytorch_lightning import Trainer
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.logger import logger
 from fastapi import UploadFile, File, Form
 from pydantic import BaseModel, Field
@@ -19,6 +20,11 @@ from pydantic import BaseModel, Field
 from cds_repository.model import MotifCNNModule
 from cds_repository.data import load_dataloader
 from cds_repository.preprocess_fasta import preprocess_fasta
+
+try:
+    import resource
+except ImportError:
+    resource = None
 
 # ----------------------------
 # Configuration
@@ -122,6 +128,14 @@ class ModelInfo(BaseModel):
 # ----------------------------
 app = FastAPI(title="CDS Predictor Inference API", version="0.1.0")
 
+_METRICS_LOCK = threading.Lock()
+_METRICS: Dict[str, Any] = {
+    "start_time": time.time(),
+    "request_count": 0,
+    "error_count": 0,
+    "total_latency_ms": 0.0,
+    "last_latency_ms": 0.0,
+}
 
 # ----------------------------
 # Core model load / validation
@@ -208,6 +222,38 @@ def startup() -> None:
     app.state.model = model
     app.state.model_meta = meta
     app.state.trainer = Trainer(accelerator="auto")
+
+
+@app.middleware("http")
+async def collect_metrics(
+    request: Request, call_next: Callable[[Request], Awaitable[Response]]
+) -> Response:
+    """
+    Collects basic request metrics for the API.
+    """
+    if request.url.path == "/metrics":
+        return await call_next(request)
+
+    start = time.perf_counter()
+    try:
+        response = await call_next(request)
+    except Exception:
+        latency_ms = (time.perf_counter() - start) * 1000.0
+        with _METRICS_LOCK:
+            _METRICS["request_count"] += 1
+            _METRICS["error_count"] += 1
+            _METRICS["total_latency_ms"] += latency_ms
+            _METRICS["last_latency_ms"] = latency_ms
+        raise
+
+    latency_ms = (time.perf_counter() - start) * 1000.0
+    with _METRICS_LOCK:
+        _METRICS["request_count"] += 1
+        if response.status_code >= 500:
+            _METRICS["error_count"] += 1
+        _METRICS["total_latency_ms"] += latency_ms
+        _METRICS["last_latency_ms"] = latency_ms
+    return response
 
 
 # ----------------------------
@@ -326,6 +372,38 @@ def runtime_config() -> Dict[str, Any]:
         "min_length": MIN_LENGTH,
         "max_length": MAX_LENGTH,
         "allow_2d_single": ALLOW_2D_SINGLE,
+    }
+
+
+@app.get("/metrics")
+def metrics() -> Dict[str, Any]:
+    """
+    Returns basic system and request metrics for the API.
+    """
+    load_avg = None
+    if hasattr(os, "getloadavg"):
+        load_avg = os.getloadavg()[0]
+
+    max_rss = None
+    if resource is not None:
+        max_rss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+
+    with _METRICS_LOCK:
+        request_count = int(_METRICS["request_count"])
+        error_count = int(_METRICS["error_count"])
+        total_latency_ms = float(_METRICS["total_latency_ms"])
+        last_latency_ms = float(_METRICS["last_latency_ms"])
+        uptime_seconds = time.time() - float(_METRICS["start_time"])
+
+    avg_latency_ms = total_latency_ms / request_count if request_count else 0.0
+    return {
+        "uptime_seconds": uptime_seconds,
+        "request_count": request_count,
+        "error_count": error_count,
+        "avg_latency_ms": avg_latency_ms,
+        "last_latency_ms": last_latency_ms,
+        "load_avg_1m": load_avg,
+        "max_rss": max_rss,
     }
 
 

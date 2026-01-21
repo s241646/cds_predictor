@@ -100,7 +100,7 @@ will check the repositories and the code to verify your answers.
 * [x] Check how robust your model is towards data drifting (M27)
 * [x] Setup collection of input-output data from your deployed application (M27)
 * [ ] Deploy to the cloud a drift detection API (M27)
-* [ ] Instrument your API with a couple of system metrics (M28)
+* [x] Instrument your API with a couple of system metrics (M28)
 * [x] Setup cloud monitoring of your instrumented application (M28)
 * [x] Create one or more alert systems in GCP to alert you if your app is not behaving correctly (M28)
 * [ ] If applicable, optimize the performance of your data loading using distributed data loading (M29)
@@ -620,7 +620,7 @@ This confirms the model is serving predictions in the cloud.
 >
 > Answer:
 
-We used Cloud Monitoring for our Cloud Run service. Cloud Run provides built-in metrics such as request count, latency, and error rate. We also created alert policies for 5xx error rate and high latency (p95). We verified the alerting setup by triggering a request-count alert and receiving an email notification. Monitoring helps us detect slow responses, failures, or unusual input patterns and keep the service reliable. For evidence, we exported the alert policies to `monitoring/alert-policies.json`.
+We used Cloud Monitoring for our Cloud Run service. Cloud Run provides built-in metrics such as request count, latency, and error rate. We also instrumented the API with a `/metrics` endpoint that reports request counts, error counts, latency, and basic system info. We created alert policies for 5xx error rate and high latency (p95), and we verified alerts by triggering a request-count alert and receiving an email notification. Monitoring helps us detect slow responses, failures, or unusual input patterns and keep the service reliable. For evidence, we exported the alert policies to `monitoring/alert-policies.json`.
 
 ## Overall discussion of project
 
