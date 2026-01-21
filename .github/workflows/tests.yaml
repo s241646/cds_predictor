@@ -15,7 +15,7 @@ jobs:
       matrix:
         operating-system: ["ubuntu-latest", "windows-latest", "macos-latest"]
         python-version: ["3.12", "3.13"]
-        pytorch-version: ["2.6.0"] # Default version installed 
+        pytorch-version: ["2.6.0"] # Default version installed
         include: #Test additional pytorch versions (2.5.0 and 2.7.0)
           - operating-system: "ubuntu-latest"
             python-version: "3.12"
