@@ -2,7 +2,9 @@ import pandas as pd
 import typer
 
 
-def preprocess_fasta(seq_dict: dict, max_length: int | None = 300, filepath: str = "data/tmp/test.csv.gz") -> None:
+def preprocess_fasta(
+    seq_dict: dict, max_length: int | None = 300, filepath: str | None = "data/tmp/test.csv.gz"
+) -> None:
     """Preprocess a FASTA file into CSV format for prediction.
 
     Args:

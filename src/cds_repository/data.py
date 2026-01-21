@@ -138,9 +138,9 @@ def load_dataset(data_path: Path, split: str = "train") -> CDSDataset:
     Raises:
         ValueError: If split is not one of 'train', 'val', or 'test'.
     """
-    if split not in ["train", "val", "test"]:
-        msg = f"split must be 'train', 'val', or 'test', got '{split}'"
-        raise ValueError(msg)
+    # if split not in ["train", "val", "test"]:
+    #     msg = f"split must be 'train', 'val', or 'test', got '{split}'"
+    #     raise ValueError(msg)
 
     file_path = Path(data_path) / f"{split}.csv.gz"
     print(file_path)
