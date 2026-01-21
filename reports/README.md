@@ -168,7 +168,12 @@ s241646, s184339, s253771, s260422
 >
 > Answer:
 
-We used **uv** for managing our project dependencies. All required packages and their versions are tracked in the **uv.lock** file. To set up a new environment, clone the repository, install **uv** (https://docs.astral.sh/uv/getting-started/installation/), and then run **uv sync**. This command reads the **uv.lock** file and installs all dependencies as specified, ensuring an identical environment. When adding or updating packages, we use **uv add <package>**, which updates the lock file.
+We used **uv** for managing our project dependencies. All required packages and their versions are tracked in the **uv.lock** file. To set up a complete copy of our development environment, one would have to follow these steps: 
+1. Clone this repository
+2. Install **uv** (https://docs.astral.sh/uv/getting-started/installation/)
+3. Run **uv sync**. This command reads the **uv.lock** file and installs all dependencies as specified, ensuring an identical environment. 
+
+When adding or updating packages during the development, we use **uv add <package>**, which updates both the **uv.lock** file and the **pyproject.toml** file.
 
 ### Question 5
 
@@ -184,7 +189,13 @@ We used **uv** for managing our project dependencies. All required packages and 
 >
 > Answer:
 
---- question 5 fill here ---
+We initialized our project using the cookiecutter template specifically developed for this course. From the template, we have filled out the ./.github/workflows folder for the continuous integration workflow, the ./configs to store the optimized hyperparameter configuration, the ./data folder to store both raw and processed datasets, the ./dockerfiles, ./models (empty, but required to save trained models when running locally)
+
+Not filled out yet: ./docs
+
+Removed: The ./notebooks, ,
+
+Added:
 
 ### Question 6
 
@@ -264,7 +275,7 @@ The total code coverage of our code is 86%, which includes all our source files.
 
 We used branches and PRs in our project. In our group, we used branches for adding new features. Each feature was developed separately on a branch, instead of the main branch. Most of the time one member worked on a branch, but other times a member could easily pick up another one's branch.
 
-Once a feature or fix is complete, we created PRs to merge to main, with a short description of the changes / new feature. Most of the time other members reviewed the PRs (sometimes in person), to catch any issues before affecting other code. For changes to the README we directly committed to main. Overall, using branches and PRs helped keep our codebase organized and reduced merge conflicts, as well as be able to trace back to early versions, if needed.
+Once a feature or fix was complete, we created PRs to merge to main, with a short description of the changes / new feature. Most of the time other members reviewed the PRs (sometimes in person), to catch any issues before affecting other code. For changes to the README we directly committed to main. Overall, using branches and PRs helped keep our codebase organized and reduced merge conflicts, as well as be able to trace back to early versions, if needed.
 
 ### Question 10
 
