@@ -579,7 +579,9 @@ Together, these metrics and visualizations provide a comprehensive view of model
 >
 > Answer:
 
---- question 28 fill here ---
+We checked how robust our model is to data drifting. As an experiment, we checked for data drift on the input data, between the training set and the test set. The genomes in the training and test sets use the same genetic code (translation table 11). However, for real-world applications we would expect that the method might also be used for sequences that originate from genomes that use alternative genetic codes. For this reason, we also checked for data drift on a genome that uses translation table 4. The script ```src/cds_repository/data_drift.py``` calculates data drift between the training data set and a dataset specified via terminal. It generates a report based both on input features and based on the final sequence representation before the output layer. The reports generated with Evidently can be seen in ```./reports/drift_check/```. 
+
+ Comment: Maybe we will have time to implement a drift detection service? 
 
 ### Question 29
 
