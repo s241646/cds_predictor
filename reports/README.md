@@ -89,7 +89,7 @@ will check the repositories and the code to verify your answers.
 * [x] Create a trigger workflow for automatically building your docker images (M21)
 * [x] Get your model training in GCP using either the Engine or Vertex AI (M21)
 * [x] Create a FastAPI application that can do inference using your model (M22)
-* [ ] Deploy your model in GCP using either Functions or Run as the backend (M23)
+* [x] Deploy your model in GCP using either Functions or Run as the backend (M23)
 * [ ] Write API tests for your application and setup continues integration for these (M24)
 * [ ] Load test your application (M24)
 * [ ] Create a more specialized ML-deployment API using either ONNX or BentoML, or both (M25)
@@ -279,7 +279,7 @@ Once a feature or fix is complete, we created PRs to merge to main, with a short
 >
 > Answer:
 
---- question 10 fill here ---
+We used DVC to manage data. The `data/` folder is tracked with DVC and stored in a GCP bucket. Git only stores the small `data.dvc` pointer file, which records hashes of the data. When someone runs `dvc pull`, the exact data version is downloaded from the bucket. This helped us keep data consistent across machines and avoid pushing large files to GitHub. It also made the CI workflow possible, because the data can be pulled during a workflow run. If we update data, we run `dvc add data` and `dvc push`, then commit the new `data.dvc`.
 
 ### Question 11
 
@@ -392,7 +392,14 @@ Together, these metrics and visualizations provide a comprehensive view of model
 >
 > Answer:
 
---- question 15 fill here ---
+We use Docker for training and inference. There are two Dockerfiles: `dockerfiles/train.dockerfile` for training and `dockerfiles/api.dockerfile` for the API. We build them locally and run them when needed. For example, to run the API
+image:
+
+`docker build -f dockerfiles/api.dockerfile -t cds-api .`
+
+`docker run --rm -p 8000:8000 cds-api`
+
+The API image is also used in Cloud Run. The training image can run one training job inside a container. Docker helps us package the environment so other team members can run the same code.
 
 ### Question 16
 
@@ -541,7 +548,7 @@ Example seeing jobs on VM:
 >
 > Answer:
 
---- question 23 fill here ---
+Yes, we built an API using FastAPI in `src/cds_repository/api.py`. The API loads a trained checkpoint and exposes `/health` for status checks and `/predict` for inference. The `/predict` endpoint takes a sequence (or FASTA file, depending on the branch) and returns logits and probabilities. We also added a simple root endpoint that shows the service status. This API is used both locally and in Cloud Run. The main goal was to create a clean inference interface with small inputs and clear outputs.
 
 ### Question 24
 
@@ -557,7 +564,13 @@ Example seeing jobs on VM:
 >
 > Answer:
 
---- question 24 fill here ---
+Yes, we deployed the API to GCP Cloud Run. The workflow builds the Docker image using `dockerfiles/api.dockerfile`, pushes it to Artifact Registry, and then deploys it to a Cloud Run service. We use a GitHub Actions workflow to automate this on `main` branch pushes. The deployed service is reachable by a public URL. We validate it by calling `/health`, `/`, and `/predict`. Example usage:
+
+`curl https://cds-api-978941563399.europe-west1.run.app/health`
+
+`curl -s -X POST https://cds-api-978941563399.europe-west1.run.app/predict -H "Content-Type: application/json" -d '{"sequence":"ATGCGT"}'`
+
+This confirms the model is serving predictions in the cloud.
 
 ### Question 25
 
@@ -678,3 +691,12 @@ We checked how robust our model is to data drifting. As an experiment, we checke
 > Answer:
 
 --- question 31 fill here ---
+
+s241646: 
+s184339: 
+s253771: 
+s260422: 
+
+All members reviewed each other's work and contributed to debugging, README updates, and pipeline design.
+
+We used generative AI to debug errors, draft workflow steps, and improve documentation. We always verified changes by running commands and checking logs.
