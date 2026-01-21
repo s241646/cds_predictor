@@ -322,7 +322,9 @@ Our continuous integration setup can be seen in ```./.github/workflows/```. We h
 - Code coverage calculation on Ubuntu with Python 3.12 (```coverage.yaml```): We calculate the code coverage every time something is pushed to the repository. This is not necessary, but gives as an easy way to check the coverage at any time something is modified. ... **REMOVE?**
 - Code linting check with ruff (```linting.yaml```): We check that all scripts passes the format checks with ruff, following the standards specified in ./pyproject.toml. 
 - Automated pre-commit hook updates (```pre-commit-update.yaml```): Since the ```.pre-commit-config.yaml``` file is not automatically updated by Dependabot, we've created ```pre-commit-update.yaml```, that automatically updates the workflow at midnight and creates a PR if there are any changes to the pre-commit hooks. The workflow can be found here: https://github.com/s241646/cds_predictor/actions/workflows/pre-commit-update.yaml, and uses https://github.com/peter-evans/create-pull-request. 
-- 
+- Check proper data loading after updates (```data-change.yml```): Checks that data can still be pulled and loaded properly, after changing data-related files.
+- Check model registry change (```model-registry-change.yml```): Triggered when model files change to verify that model artifacts exist in the ./models folder. 
+- (```deploy-cloud-run.yml```): **ADD HERE**
 
 We make use of caching, though this is not explicitly visible in the workflow .yaml files. The setup-uv action (astral-sh/setup-uv@v7) has built-in caching that stores both the uv tool itself and the installed Python packages, speeding up our continuous integration runs.
 
@@ -347,7 +349,7 @@ An example of a triggered workflow can be seen here: https://github.com/s241646/
 >
 > Answer:
 
-We configured experiments by using Hydra config files in the train script. The hyperparameters (batch size, learning rate, scheduler, architecture) are defined in confgis/config.yaml. They can be overwritten from the command line, and integrated with hyperparameter sweeps.
+We configured experiments by using Hydra config files in the train script. The hyperparameters (batch size, learning rate, scheduler, architecture) are defined in configs/config.yaml. They can be overwritten from the command line, and integrated with hyperparameter sweeps.
 
 ### Question 13
 
