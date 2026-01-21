@@ -100,6 +100,15 @@ class MotifCNNModule(pl.LightningModule):
         scheduler_patience: int = 2,
     ) -> None:
         super().__init__()
+
+        self.save_hyperparameters(
+            {
+                "in_channels": int(in_channels),
+                "channels": tuple(channels),
+                "kernel_sizes": tuple(kernel_sizes),
+            }
+        )
+
         self.model = build_model(
             in_channels=in_channels,
             channels=channels,
@@ -137,7 +146,7 @@ class MotifCNNModule(pl.LightningModule):
         self.log("val_loss", loss, on_epoch=True, prog_bar=True)
         self.log("val_acc", self._acc(logits, y), on_epoch=True, prog_bar=True)
 
-    def test_step(self, batch, batch_idx: int) -> None:
+    def test_step(self, batch, batch_idx: int) -> dict[str, torch.Tensor]:
         x, y = batch
         x = x.float()
         y = y.float()
@@ -150,6 +159,20 @@ class MotifCNNModule(pl.LightningModule):
         self.log("test_acc", acc, on_step=False, on_epoch=True)
 
         return {"loss": loss, "acc": acc}
+
+    def predict_step(
+        self, batch: tuple[torch.Tensor, torch.Tensor], batch_idx: int, dataloader_idx: int = 0
+    ) -> dict[str, torch.Tensor]:
+        # Handle both tuple (x, y) and single tensor x
+        x = batch[0] if isinstance(batch, (tuple, list)) else batch
+
+        logits = self(x)
+        probs = torch.sigmoid(logits)
+        preds = (probs >= 0.5).int()
+
+        results = {"logits": logits, "probs": probs, "preds": preds}
+
+        return results
 
     def configure_optimizers(self) -> torch.optim.Optimizer:
         opt = torch.optim.AdamW(self.parameters(), lr=self.lr, weight_decay=self.weight_decay)
