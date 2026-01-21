@@ -1,9 +1,10 @@
 import streamlit as st
 import requests
 import pandas as pd
+import os
 
 # --- Configuration ---
-API_URL = "http://localhost:8000"
+API_URL = os.getenv("API_BASE_URL", "http://localhost:8000")
 DISPLAY_LIMIT = 1000
 
 st.set_page_config(page_title="CDS Predictor", page_icon="🧬", layout="wide")
