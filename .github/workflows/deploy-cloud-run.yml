@@ -78,10 +78,14 @@ jobs:
       - name: Configure Docker auth
         run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
 
+      - name: Debug File Structure
+        run: |
+          ls -R  # This will list every file and folder in the runner
+
       - name: Build and push Frontend image
         run: |
           IMAGE=${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO }}/${{ env.SERVICE }}:latest
-          docker build -f dockerfiles/frontend.dockerfile -t "$IMAGE" .
+          docker build -f ./dockerfiles/frontend.dockerfile -t "$IMAGE" .
           docker push "$IMAGE"
 
       - name: Deploy Frontend to Cloud Run
