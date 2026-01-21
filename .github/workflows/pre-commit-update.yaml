@@ -35,7 +35,7 @@ jobs:
       - name: Create pull request
         uses: peter-evans/create-pull-request@v6 # create a PR if there are changes
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PAT_FOR_WORKFLOWS }}
           branch: update/pre-commit-autoupdate
           delete-branch: true
           title: Auto-update pre-commit hooks
