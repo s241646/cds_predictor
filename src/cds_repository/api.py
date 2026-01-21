@@ -1,7 +1,6 @@
 import io
 import os
 import time
-from pathlib import Path
 from uuid import uuid4
 import fsspec
 from typing import Any, Dict, List, Optional, Tuple
@@ -74,17 +73,6 @@ def get_device() -> torch.device:
 # ----------------------------
 
 
-def _find_latest_ckpt(checkpoint_dir: str) -> Optional[str]:
-    p = Path(checkpoint_dir)
-    if not p.exists() or not p.is_dir():
-        return None
-    ckpt_files = list(p.glob("*.ckpt"))
-    if not ckpt_files:
-        return None
-    latest_ckpt = max(ckpt_files, key=lambda x: x.stat().st_mtime)
-    return str(latest_ckpt.resolve())
-
-
 def get_latest_checkpoint(save_dir: str) -> Optional[str]:
     fs, path = fsspec.core.url_to_fs(save_dir)
 
@@ -132,14 +120,6 @@ app = FastAPI(title="CDS Predictor Inference API", version="0.1.0")
 # ----------------------------
 # Core model load / validation
 # ----------------------------
-# def _resolve_ckpt_path(requested: Optional[str] = None) -> str:
-#     ckpt_path = (requested or os.getenv(MODEL_CKPT_PATH_ENV, "")).strip()
-#     if not ckpt_path:
-#         raise RuntimeError(f"{MODEL_CKPT_PATH_ENV} is not set and no ckpt_path was provided.")
-#     p = Path(ckpt_path)
-#     if not p.exists():
-#         raise RuntimeError(f"Checkpoint not found: {ckpt_path}")
-#     return str(p.resolve())
 
 
 def _resolve_device(device_str: Optional[str]) -> torch.device:
@@ -205,10 +185,6 @@ def startup() -> None:
     app.state.model = model
     app.state.model_meta = meta
     app.state.trainer = Trainer(accelerator="auto")
-
-
-# TODO: cleanup this code
-# TODO: look at the report & my tasks
 
 
 # ----------------------------
@@ -321,7 +297,7 @@ async def upload_input_fasta(
     fasta: UploadFile = File(...),
 ) -> Dict[str, Any]:
     """
-    Endpoint to upload an input FASTA file and save it to a temporary location.
+    Endpoint to upload an input FASTA file and save it to a gcloud location.
     """
     content = await fasta.read()
     try:
@@ -344,7 +320,7 @@ async def upload_input_fasta(
     fs = fsspec.filesystem("gs")
     fs.put(local_tmp_path, gcs_dest_path)
 
-    # 4. Clean up the local temp file to save memory/disk
+    # Clean up the local temp file to save memory/disk
     os.remove(local_tmp_path)
 
     return {"message": "FASTA file uploaded successfully.", "gcs_path": gcs_dest_path}
