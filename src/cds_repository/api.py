@@ -221,7 +221,7 @@ def startup() -> None:
 
     app.state.model = model
     app.state.model_meta = meta
-    app.state.trainer = Trainer(accelerator="auto")
+    app.state.trainer = Trainer(accelerator="cpu", devices=1)
 
 
 @app.middleware("http")
@@ -259,6 +259,13 @@ async def collect_metrics(
 # ----------------------------
 # Endpoints
 # ----------------------------
+
+
+@app.get("/")
+def read_root():
+    return {"message": "CDS Predictor API is live", "docs": "/docs", "health": "/health"}
+
+
 @app.get("/health")
 def health() -> Dict[str, Any]:
     """
