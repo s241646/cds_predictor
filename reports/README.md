@@ -424,13 +424,13 @@ Together, these metrics and visualizations provide a comprehensive view of model
 >
 > Answer:
 
-We used the following services: Vertex AI, Cloud Storage, Compute Engine and Cloud Run. 
+We used the following services: Vertex AI, Cloud Storage, Compute Engine and Cloud Run.
 Compute Engine is used to create and manage Virtual Machine (VM) instances. We connect to them via SSH and can run training jobs.
 Vertex AI is used to run a custom training jobs on the virtual machines, and monitor its status and logs.
 Cloud Storage is used to store training datasets (integrated wih dvc), model checkpoints from training, container images built via Cloud Build.
 **TO DO** if we used it to store uploaded data?
 Cloud Run is used to deploy the model, allowing us to serve predictions and scale.
-The Artifact Registry is uesd to manage the train and api docker images. They are connected to the github repository and build and push images automatically when there is a change made to main. 
+The Artifact Registry is uesd to manage the train and api docker images. They are connected to the github repository and build and push images automatically when there is a change made to main.
 
 This combination enabled scalable training, reliable data storage, and efficient model deployment.
 
@@ -456,7 +456,7 @@ gcloud compute instances start cds-instance
 gcloud compute ssh cds-instance
 ```
 
-Once connected, we clone our repository, install dependencies, and configure the environment. From this VM, we triggered Vertex AI custom training jobs using the ```gcloud ai custom-jobs create command```. Specifically: 
+Once connected, we clone our repository, install dependencies, and configure the environment. From this VM, we triggered Vertex AI custom training jobs using the ```gcloud ai custom-jobs create command```. Specifically:
 ```
 gcloud ai custom-jobs create \
     --region=europe-west1 \
@@ -520,7 +520,7 @@ https://console.cloud.google.com/vertex-ai/training/custom-jobs?project=cds-pred
 >
 > Answer:
 
-We managed to train our model in the cloud using the Compute Engine. We did this by creating a VM instance with sufficient CPU, memory and disk capacity, with Pytorch already installed. We starting it by the terminal or in GCP, and connecting via SSH. The VM was useful because we could use Vertex Ai's logging to track the status of the training job, and intermediate checkpoints and outputs are saved to storage. This set-up enabled reliable and scalable model training, without relying on local hardware. We could submit a job and check back in after a few hours, without worrying about relying on and using resources of our own devices. 
+We managed to train our model in the cloud using the Compute Engine. We did this by creating a VM instance with sufficient CPU, memory and disk capacity, with Pytorch already installed. We starting it by the terminal or in GCP, and connecting via SSH. The VM was useful because we could use Vertex Ai's logging to track the status of the training job, and intermediate checkpoints and outputs are saved to storage. This set-up enabled reliable and scalable model training, without relying on local hardware. We could submit a job and check back in after a few hours, without worrying about relying on and using resources of our own devices.
 
 Example seeing jobs on VM:
 <img width="1181" height="268" alt="image" src="https://github.com/user-attachments/assets/629ce729-1c64-479a-91ca-ace7a91c832e" />
@@ -607,7 +607,7 @@ Example seeing jobs on VM:
 > Answer:
 
 --- question 27 fill here ---
-The largest cost to Josefien was the Compute Engine, followed by Vertex AI, due to the training jobs that were ran there. 
+The largest cost to Josefien was the Compute Engine, followed by Vertex AI, due to the training jobs that were ran there.
 **TODO** report on actual costs and cost of api / cloud run later
 
 Working on the cloud was frustrating, because it took a while for all the setups between data, model, training, API, inputs/outputs to work. However, once the connections were established it was useful to run long training jobs, and we experienced it was faster to make predictions on the API with the ckpt from the GCP bucket, versus the local checkpoint. It was frustrating at times to manage permission roles, especially when uploading files to the GCP buckets.
