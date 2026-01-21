@@ -2,7 +2,9 @@ import io
 import os
 import time
 from uuid import uuid4
+from pathlib import Path
 import fsspec
+import json
 from typing import Any, Dict, List, Optional, Tuple
 from Bio import SeqIO
 
@@ -27,6 +29,10 @@ MAX_BATCH_ENV = "MAX_BATCH"  # optional; defaults to 256
 MIN_LENGTH_ENV = "MIN_LENGTH"  # optional; defaults to 1
 MAX_LENGTH_ENV = "MAX_LENGTH"  # optional; defaults to 10_000
 ALLOW_2D_SINGLE_ENV = "ALLOW_2D_SINGLE"  # optional; defaults to "true"
+
+
+TMP_DIR = Path("/tmp/data")
+TMP_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def _env_float(name: str, default: float) -> float:
@@ -169,6 +175,23 @@ def _load_model(ckpt_path: str, device: torch.device) -> Tuple[MotifCNNModule, D
 
 
 # ----------------------------
+# Output:Save results to GC
+# ----------------------------
+
+
+def save_predictions(prediction_data: PredictResponse, gcs_dest_path: str):
+    """
+    Serializes PredictResponse to JSON and saves directly to GCS.
+    """
+
+    fs = fsspec.filesystem("gs")
+    results_dict = prediction_data.model_dump()
+
+    with fs.open(gcs_dest_path, "w") as f:
+        json.dump(results_dict, f)
+
+
+# ----------------------------
 # Startup: load model once
 # ----------------------------
 @app.on_event("startup")
@@ -237,15 +260,20 @@ async def predict_fasta(
     if not parsed:
         raise HTTPException(status_code=400, detail="No sequences found in FASTA.")
 
+    unique_id = uuid4()
+    local_tmp_path = f"{TMP_DIR}/uploaded_{unique_id}.csv.gz"
+    gcs_dest_path = f"gs://cds-predictor/uploaded_data/input_{unique_id}.csv.gz"
+    gcs_output_path = f"gs://cds-predictor/predictions/preds_{unique_id}.json"
+
     # Store original data for mapping
     fasta_records = [{"id": x.id, "seq": str(x.seq)} for x in parsed]
 
     # Create unique keys for preprocessor
     records = {f"{x.id}_{i}": str(x.seq) for i, x in enumerate(parsed)}
-    preprocess_fasta(seq_dict=records)
+    preprocess_fasta(seq_dict=records, filepath=local_tmp_path)
 
     effective_batch = min(batch_size, MAX_BATCH)
-    test_loader = load_dataloader("data/tmp/", split="test", batch_size=effective_batch)
+    test_loader = load_dataloader(TMP_DIR, split=f"uploaded_{unique_id}", batch_size=effective_batch)
 
     # Run inference
     predictions = app.state.trainer.predict(app.state.model, dataloaders=test_loader)
@@ -259,8 +287,10 @@ async def predict_fasta(
     all_probs = torch.cat([batch["probs"] for batch in predictions]).cpu().tolist() if return_probs else None
 
     results = []
+
+    num_to_process = min(len(all_preds), len(fasta_records))
     # Use the length of all_preds to prevent IndexError
-    for i in range(len(all_preds)):
+    for i in range(num_to_process):
         # Truncate sequence for UI visibility
         orig_seq = fasta_records[i]["seq"]
         display_seq = orig_seq[:50] + "..." if len(orig_seq) > 50 else orig_seq
@@ -273,6 +303,13 @@ async def predict_fasta(
             item.logit = float(all_logits[i])
 
         results.append(item)
+
+    fs = fsspec.filesystem("gs")
+    fs.put(local_tmp_path, gcs_dest_path)
+
+    # Clean up the local temp file to save memory/disk
+    os.remove(local_tmp_path)
+    save_predictions(PredictResponse(results=results), gcs_output_path)
 
     return PredictResponse(results=results)
 

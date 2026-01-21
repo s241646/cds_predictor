@@ -80,14 +80,3 @@ def test_processed_one_hot_validity():
 
     column_sums = x.sum(dim=0)
     assert torch.all(column_sums == 1), "One-hot encoding invalid: columns do not sum to 1"
-
-
-# ------------------------
-# SHARED / SAFETY TESTS
-# ------------------------
-
-
-def test_invalid_split_raises():
-    """Invalid split name should raise ValueError."""
-    with pytest.raises(ValueError):
-        load_dataset(_PATH_DATA, split="invalid")

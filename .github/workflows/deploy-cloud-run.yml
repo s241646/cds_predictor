@@ -8,19 +8,22 @@ on:
       - "src/**"
       - "configs/**"
       - "models/**"
-      - "dockerfiles/api.dockerfile"
+      - "dockerfiles/**" # Trigger on any dockerfile change
       - "pyproject.toml"
       - "uv.lock"
       - ".github/workflows/deploy-cloud-run.yml"
   workflow_dispatch:
 
+env:
+  PROJECT_ID: cds-predictor
+  REGION: europe-west1
+  REPO: cds-images
+
 jobs:
-  deploy:
+  # --- JOB 1: DEPLOY BACKEND API ---
+  deploy-api:
     runs-on: ubuntu-latest
     env:
-      PROJECT_ID: cds-predictor
-      REGION: europe-west1
-      REPO: cds-images
       SERVICE: cds-api
     steps:
       - uses: actions/checkout@v4
@@ -28,23 +31,64 @@ jobs:
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
+
       - name: Setup gcloud
         uses: google-github-actions/setup-gcloud@v2
         with:
           project_id: ${{ env.PROJECT_ID }}
+
       - name: Configure Docker auth
         run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
-      - name: Build and push image
+
+      - name: Build and push API image
         run: |
           IMAGE=${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO }}/${{ env.SERVICE }}:latest
           docker build -f dockerfiles/api.dockerfile -t "$IMAGE" .
           docker push "$IMAGE"
-      - name: Deploy to Cloud Run
+
+      - name: Deploy API to Cloud Run
         run: |
           IMAGE=${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO }}/${{ env.SERVICE }}:latest
           gcloud run deploy "${{ env.SERVICE }}" \
             --image "$IMAGE" \
             --region "${{ env.REGION }}" \
-            --platform managed \
+            --memory 2Gi \
             --port 8000 \
             --allow-unauthenticated
+
+  # --- JOB 2: DEPLOY FRONTEND UI ---
+  deploy-frontend:
+    runs-on: ubuntu-latest
+    needs: deploy-api # Only deploy UI if API succeeds
+    env:
+      SERVICE: streamlit-frontend
+    steps:
+      - uses: actions/checkout@v4
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Setup gcloud
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+
+      - name: Configure Docker auth
+        run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
+
+      - name: Build and push Frontend image
+        run: |
+          IMAGE=${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO }}/${{ env.SERVICE }}:latest
+          docker build -f dockerfiles/frontend.dockerfile -t "$IMAGE" .
+          docker push "$IMAGE"
+
+      - name: Deploy Frontend to Cloud Run
+        run: |
+          IMAGE=${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO }}/${{ env.SERVICE }}:latest
+          gcloud run deploy "${{ env.SERVICE }}" \
+            --image "$IMAGE" \
+            --region "${{ env.REGION }}" \
+            --memory 1Gi \
+            --allow-unauthenticated \
+            --set-env-vars API_BASE_URL=https://cds-api-978941563399.europe-west1.run.app
