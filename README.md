@@ -7,11 +7,11 @@ The overall goal of this project is to develop and train a model that can predic
 
 While more complex problem definitions are required to make it useful for real-world scenarios, this project scope is a step in that direction.
 
-The dataset we use is a simplified subset of a dataset curated by a group member for another project. The simplified dataset used for this project is placed in ```/data/raw/```. Input sequences are short DNA fragments of 300 nucleotides, with a vocabulary of {A, T, G, C}, labeled as 0 (non-coding) or 1 (coding).
+The dataset we use is a simplified subset of a dataset curated by a group member for another project. The simplified dataset used for this project is placed in ```/data/raw/training```. Input sequences are short DNA fragments of 300 nucleotides, with a vocabulary of {A, T, G, C}, labeled as 0 (non-coding) or 1 (coding). These are stored in a gzipped csv-file. 
 
 The dataset includes sequences from 8 bacterial genomes. Sequences are partiotioned so that 4 genomes are used for the training set, 2 genomes for the validation set, and 2 genomes for the test set. This ensures that no sequences from the same genome appear in different partitions. One could also split the sequences based on sequence similarity, but this approach is computationally intensive and not related to the scope of the MLOps course.
 
-We are not completely sure what model framework we will end up using, but our plan is to one-hot encode sequences and start with a simple CNN-based architecture.
+We decided to limit the time spent on model development and instead focus on the learning objectives of this course. For this reason we selected a simple CNN-based architecture for the model.
 
 ## Project structure
 
@@ -198,3 +198,14 @@ gcloud ai custom-jobs create \
 
 View progress at GCP: Vertex AI > Model development > Training > Custom jobs
 https://console.cloud.google.com/vertex-ai/training/custom-jobs?project=cds-predictor
+
+
+### Check for data drift (REMOVE?)
+The below command checks for data drift comparing the training data and another dataset, generating reports on both input features and final sequence representations. 
+```
+#Generate drift report for sequences from genome using alternative genetic code
+python src/cds_repository/data_drift.py --new-file data/processed/drift_check/drift.csv.gz --dataset-name table4
+
+#Generate drift reports for sequences from genome using alternative genetic code
+python src/cds_repository/data_drift.py --new-file data/processed/training/test.csv.gz --dataset-name testset
+```
