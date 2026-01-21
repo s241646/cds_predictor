@@ -144,11 +144,46 @@ git push origin pre-commit-autoupdate-xxxx
 ```
 
 ## GCP
-### TODO add info about dvc
+### Data (DVC + GCS)
+We store versioned data in a GCS bucket via DVC. Git tracks the `data.dvc` pointer file, while the bucket stores the actual data files.
 
-GCP repo of this project is at:
-europe-west1-docker.pkg.dev/cds-predictor/cds-repo
-On every push to main, an image is build and pushed.
+DVC remote:
+```
+gs://cds-predictor/dvc
+```
+
+Authenticate (choose one):
+```
+gcloud auth application-default login
+```
+or set a service account key:
+```
+export GOOGLE_APPLICATION_CREDENTIALS="$PWD/.dvc/gcp-sa-key.json"
+```
+
+Pull data:
+```
+uv run dvc pull --force
+```
+
+Update data:
+```
+uv run dvc add data
+uv run dvc push
+```
+
+Check data status:
+```
+uv run dvc status -c
+```
+
+### Artifact Registry
+Our image registry is:
+```
+europe-west1-docker.pkg.dev/cds-predictor/cds-images
+```
+
+On pushes to `main`, the deploy workflow builds and pushes the API image and deploys to Cloud Run.
 
 ### To connect docker with gcloud:
 ```
