@@ -169,8 +169,8 @@ s241646, s184339, s253771, s260422
 > Answer:
 
 We used **uv** for managing our project dependencies. All required packages and their versions are tracked in the **uv.lock** file. To set up a complete copy of our development environment, one would have to follow these steps: 
-1. Clone this repository
-2. Install **uv** (https://docs.astral.sh/uv/getting-started/installation/)
+1. Clone this repository.
+2. Install **uv** (Follow this link: https://docs.astral.sh/uv/getting-started/installation/).
 3. Run **uv sync**. This command reads the **uv.lock** file and installs all dependencies as specified, ensuring an identical environment. 
 
 When adding or updating packages during the development, we use **uv add <package>**, which updates both the **uv.lock** file and the **pyproject.toml** file.
@@ -189,13 +189,21 @@ When adding or updating packages during the development, we use **uv add <packag
 >
 > Answer:
 
-We initialized our project using the cookiecutter template specifically developed for this course. From the template, we have filled out the ./.github/workflows folder for the continuous integration workflow, the ./configs to store the optimized hyperparameter configuration, the ./data folder to store both raw and processed datasets, the ./dockerfiles, ./models (empty, but required to save trained models when running locally)
+We initialized our project using the cookiecutter template specifically developed for this course. From the template, we have filled out the following folders: 
+- ./.github/workflows (contains our continuous integration workflow files),
+- ./configs (stores the optimized hyperparameters),
+- ./data folder (stores both raw and processed datasets, as well as temporary files generated when making predictions),
+- the ./dockerfiles (contains Dockerfiles for training and API containers), 
+- ./models (the folder is empty, but it is used for saving trained models when running locally), 
+- ./reports, 
+- ./src/cds_repository (contains all our python scripts),
+- ./tests (contains all our unit test python scripts).  
 
-Not filled out yet: ./docs
+Not filled out yet: ./docs ##FIGURE THIS OUT! Remove or keep?
 
-Removed: The ./notebooks, ,
+We have removed the ./notebooks folder because we did not use jupyter notebooks in our project. 
 
-Added:
+We have added the following folders: ./.dvc (contains DVS configuration for data version control), ./deploy (contains documentation on deployment setup), and ./sweeps (contains a configuration file for hyperparameter search space). 
 
 ### Question 6
 
@@ -233,6 +241,8 @@ These rules and formalities matter in larger projects because many developers wo
 >
 > Answer:
 
+**UPDATE ANSWERS WITH ALL TESTS** 
+
 In total, we have implemented **19 test**s covering the data, model, and training logic.
 The data tests validate raw and processed datasets, including CSV consistency and length, correct one-hot encoding, shape, and to validate the train/test/val splits. The model tests ensure MotifCNN and its Lightning wrapper handle input shapes correctly, raise errors on invalid inputs, and compute outputs and accuracy as expected. Finally, training-related tests verify that the training step and optimizer configuration work as expected, using a simplified, synthetic signal derived from the processed one-hot data to ensure fast, deterministic learning behavior.
 
@@ -251,12 +261,12 @@ The data tests validate raw and processed datasets, including CSV consistency an
 >
 > Answer:
 
-The total code coverage can be calculated manually by running
+The total code coverage can be calculated manually by running:
 ```
 uv run coverage run --omit="*/_remote_module_non_scriptable.py" -m pytest tests/
 uv run coverage report -m > reports/coverage.txt
 ```
-, and also is automatically calculated when pushes are made to main. The coverage report is available as an artifact and linked as URL in the workflow run under 'Upload coverage artifact'.
+, and also is automatically calculated when pull requests are made to main. The coverage report is available as an artifact and linked as URL in the workflow run under 'Upload coverage artifact'.
 
 The total code coverage of our code is 86%, which includes all our source files. Coverage is high overall, but some gaps remain, particularly in data.py and model.py, where certain branches and edge cases are not tested. While high coverage increases confidence in the correctness of the code, even 100% coverage would not guarantee it is completely error-free. Code coverage only measures which lines are executed during tests, not whether the logic is correct and bugs can still exist. If the tests do not cover all edge cases, the coverage is also irrepresentative of the code's performance. Therefore, while coverage is a valuable metric, it should be complemented with code reviews and further testing to ensure robust and reliable code.
 
@@ -307,20 +317,17 @@ Once a feature or fix was complete, we created PRs to merge to main, with a shor
 >
 > Answer:
 
-For our continuous integration setup, we are running both unit tests and linting. We have defined multiple unit tests, and in our continuous integration pipeline we teston macOS, Ubuntu, and Windows. For all operative systems, we test Python versions 3.12 and 3.13. In addition, we test different PyTorch versions (2.5.0, 2.6.0, 2.7.0) on Ubuntu with both Python versions 3.12 and 3.13 to ensure compatability across our supported PyTorch range.
+Our continuous integration setup can be seen in ```./.github/workflows/```. We have organized it into 7 separate files, as described below: 
+- Unit testing with pytest (```tests.yaml```): We have defined multiple unit tests (see ```./tests/```), which we test on both macOS, Ubuntu, and Windows. For all operative systems, we test Python versions 3.12 and 3.13. In addition, we test different PyTorch versions (2.5.0, 2.6.0, 2.7.0) on Ubuntu with both Python versions 3.12 and 3.13 to ensure compatability across our supported PyTorch range.
+- Code coverage calculation on Ubuntu with Python 3.12 (```coverage.yaml```): We calculate the code coverage every time something is pushed to the repository. This is not necessary, but gives as an easy way to check the coverage at any time something is modified. ... **REMOVE?**
+- Code linting check with ruff (```linting.yaml```): We check that all scripts passes the format checks with ruff, following the standards specified in ./pyproject.toml. 
+- Automated pre-commit hook updates (```pre-commit-update.yaml```): Since the ```.pre-commit-config.yaml``` file is not automatically updated by Dependabot, we've created ```pre-commit-update.yaml```, that automatically updates the workflow at midnight and creates a PR if there are any changes to the pre-commit hooks. The workflow can be found here: https://github.com/s241646/cds_predictor/actions/workflows/pre-commit-update.yaml, and uses https://github.com/peter-evans/create-pull-request. 
+- 
 
 We make use of caching, though this is not explicitly visible in the workflow .yaml files. The setup-uv action (astral-sh/setup-uv@v7) has built-in caching that stores both the uv tool itself and the installed Python packages, speeding up our continuous integration runs.
 
-Our continuous integration setup can be seen in ```./.github/workflows/```. Specifically, we have organized it into the below separate files:
-- Unit testing with pytest (```tests.yaml```)
-- Code coverage calculation on Ubuntu with Python 3.12 (```coverage.yaml```) ##REMOVE?
-- Code linting check with ruff (```linting.yaml```)
-- Automated pre-commit hook updates, running every midnight (```pre-commit-update.yaml```)
-- Check if more is added! ##CHECK
-
 An example of a triggered workflow can be seen here: https://github.com/s241646/cds_predictor/blob/main/.github/workflows/tests.yaml
 
-Since the ```pre-commit-config.yaml``` workflow file is not automatically updated by Dependabot, we've created ```pre-commit-update.yaml```, that automatically updates the workflow at midnight and creates a PR if there are any changes to the pre-commit hooks. The workflow can be found here: https://github.com/s241646/cds_predictor/actions/workflows/pre-commit-update.yaml, and uses https://github.com/peter-evans/create-pull-request
 
 
 ## Running code and tracking experiments
