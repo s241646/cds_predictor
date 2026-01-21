@@ -2,6 +2,8 @@ import io
 import os
 import time
 from pathlib import Path
+from uuid import uuid4
+import fsspec
 from typing import Any, Dict, List, Optional, Tuple
 from Bio import SeqIO
 
@@ -9,6 +11,7 @@ import torch
 from pytorch_lightning import Trainer
 
 from fastapi import FastAPI, HTTPException
+from fastapi.logger import logger
 from fastapi import UploadFile, File, Form
 from pydantic import BaseModel, Field
 
@@ -67,6 +70,36 @@ def get_device() -> torch.device:
 
 
 # ----------------------------
+# Checkpoint selection
+# ----------------------------
+
+
+def _find_latest_ckpt(checkpoint_dir: str) -> Optional[str]:
+    p = Path(checkpoint_dir)
+    if not p.exists() or not p.is_dir():
+        return None
+    ckpt_files = list(p.glob("*.ckpt"))
+    if not ckpt_files:
+        return None
+    latest_ckpt = max(ckpt_files, key=lambda x: x.stat().st_mtime)
+    return str(latest_ckpt.resolve())
+
+
+def get_latest_checkpoint(save_dir: str) -> Optional[str]:
+    fs, path = fsspec.core.url_to_fs(save_dir)
+
+    files = fs.ls(path)
+    ckpts = [f for f in files if f.endswith(".ckpt") or f.endswith(".pt")]
+
+    if not ckpts:
+        return None
+
+    # sort by modified time
+    ckpts = sorted(ckpts, key=lambda f: fs.info(f)["mtime"])
+    return ckpts[-1]
+
+
+# ----------------------------
 # Request/Response schemas
 # ----------------------------
 
@@ -99,14 +132,14 @@ app = FastAPI(title="CDS Predictor Inference API", version="0.1.0")
 # ----------------------------
 # Core model load / validation
 # ----------------------------
-def _resolve_ckpt_path(requested: Optional[str] = None) -> str:
-    ckpt_path = (requested or os.getenv(MODEL_CKPT_PATH_ENV, "")).strip()
-    if not ckpt_path:
-        raise RuntimeError(f"{MODEL_CKPT_PATH_ENV} is not set and no ckpt_path was provided.")
-    p = Path(ckpt_path)
-    if not p.exists():
-        raise RuntimeError(f"Checkpoint not found: {ckpt_path}")
-    return str(p.resolve())
+# def _resolve_ckpt_path(requested: Optional[str] = None) -> str:
+#     ckpt_path = (requested or os.getenv(MODEL_CKPT_PATH_ENV, "")).strip()
+#     if not ckpt_path:
+#         raise RuntimeError(f"{MODEL_CKPT_PATH_ENV} is not set and no ckpt_path was provided.")
+#     p = Path(ckpt_path)
+#     if not p.exists():
+#         raise RuntimeError(f"Checkpoint not found: {ckpt_path}")
+#     return str(p.resolve())
 
 
 def _resolve_device(device_str: Optional[str]) -> torch.device:
@@ -127,7 +160,11 @@ def _resolve_device(device_str: Optional[str]) -> torch.device:
 
 
 def _load_model(ckpt_path: str, device: torch.device) -> Tuple[MotifCNNModule, Dict[str, Any]]:
-    model = MotifCNNModule.load_from_checkpoint(ckpt_path, map_location=device, weights_only=False)
+    logger.info(f"Loading checkpoint: {ckpt_path}")
+    with fsspec.open("gs://" + ckpt_path, "rb") as f:
+        # 2. Pass the open file handle directly to Lightning
+        model = MotifCNNModule.load_from_checkpoint(f, map_location=device, weights_only=False)
+    # model = MotifCNNModule.load_from_checkpoint(ckpt_path, map_location=device, weights_only=False)
     model.eval()
     model.to(device)
 
@@ -156,7 +193,12 @@ def _load_model(ckpt_path: str, device: torch.device) -> Tuple[MotifCNNModule, D
 # ----------------------------
 @app.on_event("startup")
 def startup() -> None:
-    ckpt_path = _resolve_ckpt_path()
+    ckpt_path = get_latest_checkpoint("gs://cds-predictor/models")
+    print(ckpt_path)
+
+    if ckpt_path is None:
+        logger.info("No checkpoint found in specified save_dir.")
+
     device = _resolve_device("auto")
     model, meta = _load_model(ckpt_path, device)
 
@@ -272,3 +314,37 @@ def runtime_config() -> Dict[str, Any]:
         "max_length": MAX_LENGTH,
         "allow_2d_single": ALLOW_2D_SINGLE,
     }
+
+
+@app.post("/upload_input_fasta")
+async def upload_input_fasta(
+    fasta: UploadFile = File(...),
+) -> Dict[str, Any]:
+    """
+    Endpoint to upload an input FASTA file and save it to a temporary location.
+    """
+    content = await fasta.read()
+    try:
+        text = content.decode("utf-8")
+    except UnicodeDecodeError:
+        raise HTTPException(status_code=400, detail="FASTA must be UTF-8 encoded text.")
+
+    parsed = list(SeqIO.parse(io.StringIO(text), "fasta"))
+    if not parsed:
+        raise HTTPException(status_code=400, detail="No sequences found in FASTA.")
+
+    unique_id = uuid4()
+    local_tmp_path = f"/tmp/uploaded_{unique_id}.fasta"
+    gcs_dest_path = f"gs://cds-predictor/uploaded_data/input_{unique_id}.fasta"
+
+    # Create unique keys for preprocessor
+    records = {f"{x.id}_{i}": str(x.seq) for i, x in enumerate(parsed)}
+    preprocess_fasta(seq_dict=records, filepath=local_tmp_path)
+
+    fs = fsspec.filesystem("gs")
+    fs.put(local_tmp_path, gcs_dest_path)
+
+    # 4. Clean up the local temp file to save memory/disk
+    os.remove(local_tmp_path)
+
+    return {"message": "FASTA file uploaded successfully.", "gcs_path": gcs_dest_path}
