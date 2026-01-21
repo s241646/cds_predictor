@@ -29,7 +29,7 @@ def wandb_enabled() -> bool:
 
 @dataclass
 class TrainConfig:
-    epochs: int = 30
+    epochs: int = 1
     lr: float = 3e-4
     weight_decay: float = 1e-2
     save_dir: str = "models"
@@ -105,8 +105,10 @@ def main(cfg) -> None:
         dirpath=cfg.save_dir,
         filename="best-{epoch:02d}-{val_loss:.2f}",
         save_top_k=1,
+        save_last=True,  # <-- THIS creates last.ckpt
         mode="min",
     )
+
     early_stopping_callback = EarlyStopping(
         monitor="val_loss",
         patience=cfg.patience,
