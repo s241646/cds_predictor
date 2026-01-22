@@ -17,47 +17,76 @@ We decided to limit the time spent on model development and instead focus on the
 
 The directory structure of the project looks like this:
 ```txt
-├── .github/                  # Github actions and dependabot
+├── .dvc/                      # DVC config/cache (local)
+├── .github/                   # GitHub config
+│   ├── agents/
+│   ├── prompts/
 │   ├── dependabot.yaml
 │   └── workflows/
+│       ├── coverage.yaml
+│       ├── data-change.yml
+│       ├── deploy-cloud-run.yml
+│       ├── linting.yaml
+│       ├── model-registry-change.yml
+│       ├── pre-commit-update.yaml
 │       └── tests.yaml
-├── configs/                  # Configuration files
-├── data/                     # Data directory
-│   ├── processed
-│   └── raw
-├── dockerfiles/              # Dockerfiles
-│   ├── api.Dockerfile
-│   └── train.Dockerfile
-├── docs/                     # Documentation
-│   ├── mkdocs.yml
+├── configs/                   # Configuration files
+├── data/                      # Data directory
+│   ├── processed/
+│   ├── raw/
+│   └── tmp/
+├── deploy/                    # Deployment docs
+│   └── README.md
+├── dockerfiles/               # Dockerfiles
+│   ├── api.dockerfile
+│   ├── frontend.dockerfile
+│   └── train.dockerfile
+├── docs/                      # Documentation
+│   ├── README.md
+│   ├── mkdocs.yaml
 │   └── source/
 │       └── index.md
-├── models/                   # Trained models
-├── notebooks/                # Jupyter notebooks
-├── reports/                  # Reports
+├── models/                    # Trained models
+├── monitoring/                # Monitoring artifacts
+│   └── alert-policies.json
+├── reports/                   # Reports and figures
+│   ├── README.md
+│   ├── report.py
+│   ├── drift_check/
 │   └── figures/
-├── src/                      # Source code
-│   ├── project_name/
-│   │   ├── __init__.py
-│   │   ├── api.py
-│   │   ├── data.py
-│   │   ├── evaluate.py
-│   │   ├── models.py
-│   │   ├── train.py
-│   │   └── visualize.py
-└── tests/                    # Tests
+├── src/                       # Source code
+│   └── cds_repository/
+│       ├── api.py
+│       ├── app.py
+│       ├── data.py
+│       ├── data_drift.py
+│       ├── evaluate.py
+│       ├── model.py
+│       ├── preprocess_fasta.py
+│       └── train.py
+├── sweeps/                    # Sweep configs
+│   └── motifcnn_sweep.yaml
+├── tests/                     # Tests
 │   ├── __init__.py
+│   ├── conftest.py
 │   ├── test_api.py
 │   ├── test_data.py
-│   └── test_model.py
+│   ├── test_model.py
+│   ├── test_train.py
+│   └── utils.py
+├── .dvcignore
 ├── .gitignore
 ├── .pre-commit-config.yaml
+├── AGENTS.md
+├── cloudbuild.yaml
+├── config_cpu.yaml
+├── data.dvc
 ├── LICENSE
-├── pyproject.toml            # Python project file
-├── README.md                 # Project README
-├── requirements.txt          # Project requirements
-├── requirements_dev.txt      # Development requirements
-└── tasks.py                  # Project tasks
+├── pyproject.toml             # Python project file
+├── README.md                  # Project README
+├── requirements.txt           # Project requirements
+├── tasks.py                   # Project tasks
+└── uv.lock
 ```
 
 
