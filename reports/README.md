@@ -189,13 +189,13 @@ When adding or updating packages during the development, we use **uv add <packag
 >
 > Answer:
 
-We initialized our project using the cookiecutter template specifically developed for this course. From the template, we have filled out the following folders: 
+We initialized our project using the cookiecutter template specifically developed for this course. From the template, we have filled out the following folders:
 - ./.github/workflows (contains our continuous integration workflow files)
 - ./configs (stores the optimized hyperparameters)
 - ./data folder (stores both raw and processed datasets, as well as temporary files generated when making predictions)
-- ./dockerfiles (contains Dockerfiles for training and API containers), 
+- ./dockerfiles (contains Dockerfiles for training and API containers),
 - ./models (the folder is empty, but it is used for saving trained models when running locally)
-- ./reports 
+- ./reports
 - ./src/cds_repository (contains all our python scripts)
 - ./tests (contains all our unit test python scripts)
 
@@ -352,7 +352,7 @@ We configured experiments by using Hydra config files in the train script. The o
 python -m cds_repository.train epochs=50 hyperparameters.batch_size=32 dropout=0.3
 ```
 
-The parameters can also be integrated with hyperparameter sweeps, using the W&B sweep configurations specified in sweeps/motifcnn_sweep.yaml. 
+The parameters can also be integrated with hyperparameter sweeps, using the W&B sweep configurations specified in sweeps/motifcnn_sweep.yaml.
 
 
 ### Question 13
@@ -391,7 +391,7 @@ python train.py +wandb_run_id=<run_id>
 
 We tracked and visualized experiments in Weights & Biases, as well as analyzing hyperparameter sweeps.
 
-During training, we track both the loss and accuracy on both the training and validation set. Monitoring of these metrics helps us monitor points of model convergence, potential overfitting and generalization. A model that does well should decrease validation loss, have increasing validation accuracy, and ideally similar training and validation loss when averaged over batches. We could also have logged additional metrics such as AUC, sensitivity and specificity (these would also be useful to monitor since the dataset is imbalanced). 
+During training, we track both the loss and accuracy on both the training and validation set. Monitoring of these metrics helps us monitor points of model convergence, potential overfitting and generalization. A model that does well should decrease validation loss, have increasing validation accuracy, and ideally similar training and validation loss when averaged over batches. We could also have logged additional metrics such as AUC, sensitivity and specificity (these would also be useful to monitor since the dataset is imbalanced).
 ![Logging of experiments with loss curves and performance progress in Weights and Biases.](./figures/Q14_wandb_log_progress.png)
 
 The next image shows the parameter importance of the most useful/important parameters based on training accuracy.
@@ -444,9 +444,9 @@ The training container expects the dataset to be available locally or pulled wit
 >
 > Answer:
 
-When running into bugs, we mostly asked an LLM to help us understand the bug in order to fix it. 
+When running into bugs, we mostly asked an LLM to help us understand the bug in order to fix it.
 
-We did profile the code, and below is a screenshot of the output report: 
+We did profile the code, and below is a screenshot of the output report:
 
 ![Logging of experiments with loss curves and performance progress in Weights and Biases.](./figures/Q16_profiler_results.jpeg)
 
@@ -469,10 +469,10 @@ One training epoch only took about 30 seconds which we believe is already quite 
 > Answer:
 
 We used the following services: Cloud Storage, Artifact Registry, Cloud Run, Cloud Build, Cloud Monitoring, Cloud Logging.
-- Cloud Storage is used as the DVC remote for datasets. 
+- Cloud Storage is used as the DVC remote for datasets.
 - Artifact Registry stores our Docker images (API and training).
-- Cloud Run hosts the deployed API and provides autoscaling. 
-- Cloud Build uses `cloudbuild.yaml` to build and push a training image when triggered. 
+- Cloud Run hosts the deployed API and provides autoscaling.
+- Cloud Build uses `cloudbuild.yaml` to build and push a training image when triggered.
 - Cloud Monitoring provides built-in Cloud Run metrics and alerting for error rate and latency.
 - Cloud Logging enables inspection of custom train jobs logs
 This combination covers data storage, container hosting, CI builds, and service monitoring.
@@ -525,8 +525,8 @@ https://console.cloud.google.com/vertex-ai/training/custom-jobs?project=cds-pred
 --- question 19 fill here ---
 
 
-![Bucket outputs.](./figures/Q19_bucket.png)
-![Bucket models.](./figures/Q19_bucket_models.png)
+![Bucket outputs.](./figures/Q19_bucket1.png)
+![Bucket models.](./figures/Q19_bucket2.png)
 
 ### Question 20
 
@@ -536,8 +536,7 @@ https://console.cloud.google.com/vertex-ai/training/custom-jobs?project=cds-pred
 > Answer:
 
 --- question 20 fill here ---
-<img width="1288" height="399" alt="image" src="https://github.com/user-attachments/assets/c4e880ac-d8e2-4894-8d34-c95d344041f8" />
-<img width="1326" height="360" alt="image" src="https://github.com/user-attachments/assets/3c561e69-4e78-4672-ae5e-23f386f7361b" />
+![Artifacts.](./figures/Q20_artifacts.png)
 
 
 ### Question 21
@@ -547,8 +546,7 @@ https://console.cloud.google.com/vertex-ai/training/custom-jobs?project=cds-pred
 >
 > Answer:
 
-<img width="1430" height="504" alt="image" src="https://github.com/user-attachments/assets/41db14b7-6ae5-4bf7-9125-9bbf3b5ab345" />
-
+![Artifacts.](./figures/Q21_cloudbuild.png)
 
 ### Question 22
 
@@ -566,8 +564,7 @@ https://console.cloud.google.com/vertex-ai/training/custom-jobs?project=cds-pred
 We managed to train our model in the cloud using the Compute Engine. We did this by creating a VM instance with sufficient CPU, memory and disk capacity, with Pytorch already installed. We starting it by the terminal or in GCP, and connecting via SSH. The VM was useful because we could use Vertex Ai's logging to track the status of the training job, and intermediate checkpoints and outputs are saved to storage. This set-up enabled reliable and scalable model training, without relying on local hardware. We could submit a job and check back in after a few hours, without worrying about relying on and using resources of our own devices.
 
 Example seeing jobs on VM:
-<img width="1181" height="268" alt="image" src="https://github.com/user-attachments/assets/629ce729-1c64-479a-91ca-ace7a91c832e" />
-
+![Artifacts.](./figures/Q21_VM.png)
 
 ## Deployment
 
@@ -675,9 +672,11 @@ Working on the cloud was frustrating, because it took a while for all the setups
 >
 > Answer:
 
-We checked how robust our model is to data drifting. As an experiment, we checked for data drift on the input data, between the training set and the test set. The genomes in the training and test sets use the same genetic code (translation table 11). However, for real-world applications we would expect that the method might also be used for sequences that originate from genomes that use alternative genetic codes. For this reason, we also checked for data drift on a genome that uses translation table 4. The script ```src/cds_repository/data_drift.py``` calculates data drift between the training data set and a dataset specified via terminal. It generates a report based both on input features and based on the final sequence representation before the output layer. The reports generated with Evidently can be seen in ```./reports/drift_check/```.
+We checked how robust our model is to data drifting. As an experiment, we checked for data drift on the input data, between the training set and the test set. The genomes in the training and test sets use the same genetic code (translation table 11). However, for real-world applications we would expect that the method might also be used for sequences that originate from genomes that use alternative genetic codes. For this reason, we also checked for data drift on a genome that uses translation table 4. The script ```src/cds_repository/data_drift.py``` calculates data drift between the training data set and a dataset specified via terminal. It generates a report based both on input features and based on the final sequence representation (embeddings) before the output layer. The reports generated with Evidently can be seen in ```./reports/drift_check/```. The drift check can also be ran on uploaded data from the API. See README for useage.
 
- Comment: Maybe we will have time to implement a drift detection service?
+
+![Drift.](./figures/Q28_drift.png)
+![Drift2.](./figures/Q28_drift2.png)
 
 ### Question 29
 
@@ -708,13 +707,13 @@ We checked how robust our model is to data drifting. As an experiment, we checke
 >
 > Answer:
 
-The biggest challenges in this project were related to solving merge conflicts, both on GitHub and with DVC. When developing a new functionality, we practiced creating a new branch, pushing to it, and then merging with main, which definitely helped avoiding major merge conflicts. However, sometimes more than one person would work on the same functionality etc. and solving merge comflicts from this was challenging at times. 
+The biggest challenges in this project were related to solving merge conflicts, both on GitHub and with DVC. When developing a new functionality, we practiced creating a new branch, pushing to it, and then merging with main, which definitely helped avoiding major merge conflicts. However, sometimes more than one person would work on the same functionality etc. and solving merge comflicts from this was challenging at times.
 
-Apart from the merge conflicts, the deployment also took quite some time. It was not because there was any big struggles related to this part, but it was just one of the more time consuming tasks because none of us had any experience with it. For this reason, it took more time to figure out the cause of each bug. At first it was difficult because we did not know where and how to look for the bugs and solutions to them, but at the end of week 2 we became more familiar with it, and it definitely helped to gain some confidence with working on the cloud. 
+Apart from the merge conflicts, the deployment also took quite some time. It was not because there was any big struggles related to this part, but it was just one of the more time consuming tasks because none of us had any experience with it. For this reason, it took more time to figure out the cause of each bug. At first it was difficult because we did not know where and how to look for the bugs and solutions to them, but at the end of week 2 we became more familiar with it, and it definitely helped to gain some confidence with working on the cloud.
 
-Furthermore, we also spent a lot of time connecting everything together and making sure that all functionalities were up to date when implementing new things. 
+Furthermore, we also spent a lot of time connecting everything together and making sure that all functionalities were up to date when implementing new things.
 
-Overall, we had a good group dynamic and helped each other out, so that challenges did not become too big to overcome for us. 
+Overall, we had a good group dynamic and helped each other out, so that challenges did not become too big to overcome for us.
 
 ### Question 31
 
