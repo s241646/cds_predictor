@@ -241,8 +241,8 @@ These rules and formalities matter in larger projects because many developers wo
 >
 > Answer:
 
-In total, we have implemented **24 test**s covering the data, model, training, and API logics.
-The data tests validate raw and processed datasets, including CSV consistency and length, correct one-hot encoding, shape, and to validate the train/test/val splits. The model tests ensure MotifCNN and its Lightning wrapper handle input shapes correctly, raise errors on invalid inputs, and compute outputs and accuracy as expected. Finally, training-related tests verify that the training step and optimizer configuration work as expected, using a simplified, synthetic signal derived from the processed one-hot data to ensure fast, deterministic learning behavior.
+In total, we have implemented  **24 tests** covering the data, model, training, and API logics.
+The data tests validate raw and processed datasets, including CSV consistency and length, correct one-hot encoding, shape, and to validate the train/test/val splits. The model tests ensure MotifCNN and its Lightning wrapper handle input shapes correctly, raise errors on invalid inputs, and compute outputs and accuracy as expected. Training-related tests verify that the training step and optimizer configuration work as expected. Finally, for the API, we implemented integration tests using FastAPI's TestClient to verify endpoint routing, health checks, and the prediction pipeline.
 
 ### Question 8
 
@@ -618,7 +618,9 @@ This confirms the API is reachable and serving predictions in the cloud, and it 
 >
 > Answer:
 
---- question 25 fill here ---
+For unit and integration testing, we implemented a comprehensive testing framework using pytest and FastAPI's TestClient. Since our production model is stored in a GCS bucket that GitHub Actions cannot access, we also implemented a conftest.py file to mock the model inference and storage layers. To find out where our service actually breaks, we conducted a local load test using Locust, ramping up concurrent users to empirically identify our hardware's saturation point.
+
+Our testing identified a clear CPU-bound bottleneck during CNN inference. At 10 concurrent users, the API reached its most efficient state with a median prediction latency of 3.1 seconds and a 95th percentile of 6.9 seconds. As we scaled to 20 users, throughput (RPS) remained flat while latency doubled, indicating the system had reached its maximum work capacity. Beyond this point, the service became severely congested: at 40 users, 95th percentile response times spiked to 39 seconds, and at 50 users, the system failed with a 7% error rate. We concluded that the current configuration can reliably support 10 concurrent users with acceptable latency, but horizontal scaling or request batching would be mandatory to support larger volumes.
 
 ### Question 26
 
