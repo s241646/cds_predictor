@@ -90,8 +90,8 @@ will check the repositories and the code to verify your answers.
 * [x] Get your model training in GCP using either the Engine or Vertex AI (M21)
 * [x] Create a FastAPI application that can do inference using your model (M22)
 * [x] Deploy your model in GCP using either Functions or Run as the backend (M23)
-* [ ] Write API tests for your application and setup continues integration for these (M24)
-* [ ] Load test your application (M24)
+* [x] Write API tests for your application and setup continues integration for these (M24)
+* [x] Load test your application (M24)
 * [ ] Create a more specialized ML-deployment API using either ONNX or BentoML, or both (M25)
 * [x] Create a frontend for your API (M26)
 
@@ -168,12 +168,12 @@ s241646, s184339, s253771, s260422
 >
 > Answer:
 
-We used **uv** for managing our project dependencies. All required packages and their versions are tracked in the **uv.lock** file. To set up a complete copy of our development environment, the following steps should be followed: 
+We used **uv** for managing our project dependencies. All required packages and their versions are tracked in the **uv.lock** file. To set up a complete copy of our development environment, the following steps should be followed:
 1. Clone this repository.
 2. Install **uv** (Follow this link: https://docs.astral.sh/uv/getting-started/installation/).
-3. Run **uv sync**. This command reads the **uv.lock** file and installs all dependencies as specified, ensuring an identical environment. 
+3. Run **uv sync**. This command reads the **uv.lock** file and installs all dependencies as specified, ensuring an identical environment.
 
-When adding or updating packages during the development, we use **uv add <package>**, which updates both the **uv.lock** file and the **pyproject.toml** file. The updated files were then pushed to a branch and merged with main. 
+When adding or updating packages during the development, we use **uv add <package>**, which updates both the **uv.lock** file and the **pyproject.toml** file. The updated files were then pushed to a branch and merged with main.
 
 ### Question 5
 
@@ -201,7 +201,7 @@ We initialized our project using the cookiecutter template specifically develope
 
 Not filled out yet: ./docs ##FIGURE THIS OUT! Remove or keep?
 
-We have removed the ./notebooks folder because we did not use jupyter notebooks in our project. 
+We have removed the ./notebooks folder because we did not use jupyter notebooks in our project.
 
 We have added the following folders: ./.dvc (contains DVC configuration for data version control), ./deploy (contains documentation on deployment setup), and ./sweeps (contains a configuration file for hyperparameter search space).
 
@@ -241,7 +241,7 @@ These rules and formalities matter in larger projects because many developers wo
 >
 > Answer:
 
-**UPDATE ANSWERS WITH ALL TESTS** 
+**UPDATE ANSWERS WITH ALL TESTS**
 
 In total, we have implemented **19 test**s covering the data, model, and training logic.
 The data tests validate raw and processed datasets, including CSV consistency and length, correct one-hot encoding, shape, and to validate the train/test/val splits. The model tests ensure MotifCNN and its Lightning wrapper handle input shapes correctly, raise errors on invalid inputs, and compute outputs and accuracy as expected. Finally, training-related tests verify that the training step and optimizer configuration work as expected, using a simplified, synthetic signal derived from the processed one-hot data to ensure fast, deterministic learning behavior.
@@ -270,7 +270,7 @@ uv run coverage report -m > reports/coverage.txt
 
 The total code coverage of our code is 86%, which includes all our source files. Coverage is high overall, but some gaps remain, particularly in data.py and model.py, where certain branches and edge cases are not tested. While high coverage increases confidence in the correctness of the code, even 100% coverage would not guarantee it is completely error-free. Code coverage only measures which lines are executed during tests, not whether the logic is correct and bugs can still exist. If the tests do not cover all edge cases, the coverage is also irrepresentative of the code's performance. Therefore, while coverage is a valuable metric, it should be complemented with code reviews and further testing to ensure robust and reliable code.
 
-##REWRITE AFTER API 
+##REWRITE AFTER API
 
 ### Question 9
 
@@ -319,13 +319,13 @@ We used DVC to manage data. The `data/` folder is tracked with DVC and stored in
 >
 > Answer:
 
-Our continuous integration setup can be seen in ```./.github/workflows/```. We have organized it into 7 separate files, as described below: 
+Our continuous integration setup can be seen in ```./.github/workflows/```. We have organized it into 7 separate files, as described below:
 - Unit testing with pytest (```tests.yaml```): We have defined multiple unit tests (see ```./tests/```), which we test on both macOS, Ubuntu, and Windows. For all operative systems, we test Python versions 3.12 and 3.13. In addition, we test different PyTorch versions (2.5.0, 2.6.0, 2.7.0) on Ubuntu with both Python versions 3.12 and 3.13 to ensure compatability across our supported PyTorch range.
 - Code coverage calculation on Ubuntu with Python 3.12 (```coverage.yaml```): We calculate the code coverage every time something is pushed to the repository. This is not necessary, but gives as an easy way to check the coverage at any time something is modified. ... **REMOVE?**
-- Code linting check with ruff (```linting.yaml```): We check that all scripts passes the format checks with ruff, following the standards specified in ./pyproject.toml. 
-- Automated pre-commit hook updates (```pre-commit-update.yaml```): Since the ```.pre-commit-config.yaml``` file is not automatically updated by Dependabot, we've created ```pre-commit-update.yaml```, that automatically updates the workflow at midnight and creates a PR if there are any changes to the pre-commit hooks. The workflow can be found here: https://github.com/s241646/cds_predictor/actions/workflows/pre-commit-update.yaml, and uses https://github.com/peter-evans/create-pull-request. 
+- Code linting check with ruff (```linting.yaml```): We check that all scripts passes the format checks with ruff, following the standards specified in ./pyproject.toml.
+- Automated pre-commit hook updates (```pre-commit-update.yaml```): Since the ```.pre-commit-config.yaml``` file is not automatically updated by Dependabot, we've created ```pre-commit-update.yaml```, that automatically updates the workflow at midnight and creates a PR if there are any changes to the pre-commit hooks. The workflow can be found here: https://github.com/s241646/cds_predictor/actions/workflows/pre-commit-update.yaml, and uses https://github.com/peter-evans/create-pull-request.
 - Check proper data loading after updates (```data-change.yml```): Checks that data can still be pulled and loaded properly, after changing data-related files.
-- Check model registry change (```model-registry-change.yml```): Triggered when model files change to verify that model artifacts exist in the ./models folder. 
+- Check model registry change (```model-registry-change.yml```): Triggered when model files change to verify that model artifacts exist in the ./models folder.
 - (```deploy-cloud-run.yml```): **ADD HERE**
 
 We make use of caching, though this is not explicitly visible in the workflow .yaml files. The setup-uv action (astral-sh/setup-uv@v7) has built-in caching that stores both the uv tool itself and the installed Python packages, speeding up our continuous integration runs.
@@ -678,7 +678,7 @@ Working on the cloud was frustrating, because it took a while for all the setups
 >
 > Answer:
 
-We checked how robust our model is to data drifting. As an experiment, we checked for data drift on the input data, between the training set and the test set. The genomes in the training and test sets use the same genetic code (translation table 11). However, for real-world applications we would expect that the method might also be used for sequences that originate from genomes that use alternative genetic codes. For this reason, we also checked for data drift on a genome that uses translation table 4. The script ```src/cds_repository/data_drift.py``` calculates data drift between the training data set and a dataset specified via terminal. It generates a report based both on input features and based on the final sequence representation before the output layer. The reports generated with Evidently can be seen in ```./reports/drift_check/```. 
+We checked how robust our model is to data drifting. As an experiment, we checked for data drift on the input data, between the training set and the test set. The genomes in the training and test sets use the same genetic code (translation table 11). However, for real-world applications we would expect that the method might also be used for sequences that originate from genomes that use alternative genetic codes. For this reason, we also checked for data drift on a genome that uses translation table 4. The script ```src/cds_repository/data_drift.py``` calculates data drift between the training data set and a dataset specified via terminal. It generates a report based both on input features and based on the final sequence representation before the output layer. The reports generated with Evidently can be seen in ```./reports/drift_check/```.
 
  Comment: Maybe we will have time to implement a drift detection service?
 
@@ -737,10 +737,10 @@ Overall, we had a good group dynamic and helped each other out, so that challeng
 
 --- question 31 fill here ---
 
-s241646: 
-s184339: 
-s253771: 
-s260422: 
+s241646:
+s184339:
+s253771:
+s260422:
 
 All members reviewed each other's work and contributed to debugging, README updates, and pipeline design.
 
