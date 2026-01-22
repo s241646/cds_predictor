@@ -260,12 +260,20 @@ View progress at GCP: Vertex AI > Model development > Training > Custom jobs
 https://console.cloud.google.com/vertex-ai/training/custom-jobs?project=cds-predictor
 
 
-### Check for data drift (REMOVE?)
+### Check for data drift
 The below command checks for data drift comparing the training data and another dataset, generating reports on both input features and final sequence representations.
 ```
 #Generate drift report for sequences from genome using alternative genetic code
-python src/cds_repository/data_drift.py --new-file data/processed/drift_check/drift.csv.gz --dataset-name table4
+python src/cds_repository/data_drift.py --new-file data/processed/drift_check/tt4_genome.csv.gz --dataset-name table4
 
 #Generate drift reports for sequences from genome using alternative genetic code
 python src/cds_repository/data_drift.py --new-file data/processed/training/test.csv.gz --dataset-name testset
+```
+
+Checking for data drift in GCP bucket from inputs to API
+replace ```<uploaded-file>.csv.gz``` with name
+```
+python src/cds_repository/data_drift.py \
+  --new-file gs://cds-predictor/uploaded_data/<uploaded-file>.csv.gz \
+  --dataset-name uploaded_raw
 ```
