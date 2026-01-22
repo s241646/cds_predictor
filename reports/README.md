@@ -464,9 +464,14 @@ The API image is also used for Cloud Run deployment. Docker ensures a reproducib
 >
 > Answer:
 
-We used the following services: Cloud Storage, Artifact Registry, Cloud Run, Cloud Build, and Cloud Monitoring.
-Cloud Storage is used as the DVC remote for datasets. Artifact Registry stores our Docker images (API and training).
-Cloud Run hosts the deployed API and provides autoscaling. Cloud Build uses `cloudbuild.yaml` to build and push a training image when triggered. Cloud Monitoring provides built-in Cloud Run metrics and alerting for error rate and latency. This combination covers data storage, container hosting, CI builds, and service monitoring.
+We used the following services: Cloud Storage, Artifact Registry, Cloud Run, Cloud Build, Cloud Monitoring, Cloud Logging.
+- Cloud Storage is used as the DVC remote for datasets. 
+- Artifact Registry stores our Docker images (API and training).
+- Cloud Run hosts the deployed API and provides autoscaling. 
+- Cloud Build uses `cloudbuild.yaml` to build and push a training image when triggered. 
+- Cloud Monitoring provides built-in Cloud Run metrics and alerting for error rate and latency.
+- Cloud Logging enables inspection of custom train jobs logs
+This combination covers data storage, container hosting, CI builds, and service monitoring.
 
 ### Question 18
 
