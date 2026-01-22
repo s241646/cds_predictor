@@ -447,7 +447,14 @@ The API image is also used for Cloud Run deployment. Docker ensures a reproducib
 >
 > Answer:
 
---- question 16 fill here ---
+When running into bugs, we mostly asked an LLM to help us understand the bug in order to fix it. 
+
+We did profile the code, and below is a screenshot of the output report: 
+
+![Logging of experiments with loss curves and performance progress in Weights and Biases.](./figures/Q16_profiler_results.jpeg)
+
+One training epoch only took about 30 seconds which we believe is already quite fast. For this reason, we did not try to optimize our code based on the profiling. We think that code can always be optimized somehow (and hence it is not perfect), but for this project we decided to prioritize our resoruces elsewhere.
+
 
 ## Working in the cloud
 
