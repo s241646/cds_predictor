@@ -302,7 +302,7 @@ Once a feature or fix was complete, we created PRs to merge to main, with a shor
 >
 > Answer:
 
-We used DVC to manage data. The `data/` folder is tracked with DVC and stored in a GCP bucket. Git only stores the small `data.dvc` pointer file, which records hashes of the data. When someone runs `dvc pull`, the exact data version is downloaded from the bucket. This helped us keep data consistent across machines and to avoid pushing large files to GitHub. It also made the CI workflow possible, because the data can be pulled during a workflow run. If we update data, we run `dvc add data` and `dvc push`, then commit the new `data.dvc`.
+We used DVC to manage data. The `data/` folder is tracked with DVC and stored in a GCP bucket. Git only stores the small `data.dvc` pointer file, which records hashes of the data. When someone runs `dvc pull`, the exact data version is downloaded from the bucket. This helped us keep data consistent across machines and to avoid pushing large files to GitHub. It also made the CI workflow possible, because the data can be pulled during a workflow run. If we update data, we run `dvc add data` and `dvc push`, then commit the new `data.dvc`. It also gives us a clear history of data changes and rollbacks.
 
 ### Question 11
 
