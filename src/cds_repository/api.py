@@ -16,6 +16,7 @@ from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.logger import logger
 from fastapi import UploadFile, File, Form
 from pydantic import BaseModel, Field
+from contextlib import asynccontextmanager
 
 from cds_repository.model import MotifCNNModule
 from cds_repository.data import load_dataloader
@@ -123,11 +124,6 @@ class ModelInfo(BaseModel):
     hparams: Dict[str, Any] = Field(default_factory=dict)
 
 
-# ----------------------------
-# App
-# ----------------------------
-app = FastAPI(title="CDS Predictor Inference API", version="0.1.0")
-
 _METRICS_LOCK = threading.Lock()
 _METRICS: Dict[str, Any] = {
     "start_time": time.time(),
@@ -206,28 +202,47 @@ def save_predictions(prediction_data: PredictResponse, gcs_dest_path: str):
 
 
 # ----------------------------
-# Startup: load model once
+# App Lifespan
 # ----------------------------
-@app.on_event("startup")
-def startup() -> None:
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     ckpt_path = get_latest_checkpoint("gs://cds-predictor/models")
-    print(ckpt_path)
 
     if ckpt_path is None:
-        logger.info("No checkpoint found in specified save_dir.")
+        logger.warning("No checkpoint found in specified save_dir.")
+        app.state.model = None
+    else:
+        print(f"Loading model from: {ckpt_path}")
+        try:
+            device = _resolve_device("auto")
+            model, meta = _load_model(ckpt_path, device)
+            app.state.model = model
+            app.state.model_meta = meta
 
-    device = _resolve_device("auto")
-    model, meta = _load_model(ckpt_path, device)
+            app.state.trainer = Trainer(accelerator="cpu", devices=1)
+            logger.info("Model loaded successfully into app.state")
+        except Exception as e:
+            logger.error(f"Failed to load model during startup: {e}")
+            app.state.model = None
 
-    app.state.model = model
-    app.state.model_meta = meta
-    app.state.trainer = Trainer(accelerator="cpu", devices=1)
+    yield
+
+    # --- Shutdown: ---
+    if hasattr(app.state, "model"):
+        del app.state.model
+    logger.info("Shutting down: model resources cleared.")
+
+
+# ----------------------------
+# App
+# ----------------------------
+app = FastAPI(title="CDS Predictor Inference API", version="0.1.0", lifespan=lifespan)
 
 
 @app.middleware("http")
-async def collect_metrics(
-    request: Request, call_next: Callable[[Request], Awaitable[Response]]
-) -> Response:
+async def collect_metrics(request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
     """
     Collects basic request metrics for the API.
     """
@@ -326,7 +341,7 @@ async def predict_fasta(
     preprocess_fasta(seq_dict=records, filepath=local_tmp_path)
 
     effective_batch = min(batch_size, MAX_BATCH)
-    test_loader = load_dataloader(TMP_DIR, split=f"uploaded_{unique_id}", batch_size=effective_batch)
+    test_loader = load_dataloader(TMP_DIR, split=f"uploaded_{unique_id}", batch_size=effective_batch, num_workers=0)
 
     # Run inference
     predictions = app.state.trainer.predict(app.state.model, dataloaders=test_loader)
