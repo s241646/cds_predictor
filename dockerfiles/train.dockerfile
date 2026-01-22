@@ -9,7 +9,6 @@ COPY uv.lock uv.lock
 RUN uv sync --frozen --no-install-project
 
 COPY src src/
-COPY data data/
 COPY models models/
 COPY configs configs/
 
