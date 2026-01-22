@@ -529,7 +529,7 @@ https://console.cloud.google.com/vertex-ai/training/custom-jobs?project=cds-pred
 
 
 ![Bucket outputs.](./figures/Q19_bucket.png)
-![Bucket models.](./figures/Q19_bucket_model.png)
+![Bucket models.](./figures/Q19_bucket_models.png)
 
 ### Question 20
 
