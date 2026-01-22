@@ -5,6 +5,8 @@ workerPoolSpecs:
     replicaCount: 1
     containerSpec:
         imageUri: 'europe-west1-docker.pkg.dev/cds-predictor/cds-repo/train:latest'
+        command: ["sh", "-c"]
+        args: ["uv run dvc config core.no_scm true && uv run dvc pull --force && uv run src/cds_repository/train.py"]
         env:
         - name: WANDB_MODE
           value: offline
