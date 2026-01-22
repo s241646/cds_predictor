@@ -241,12 +241,8 @@ These rules and formalities matter in larger projects because many developers wo
 >
 > Answer:
 
-**UPDATE ANSWERS WITH ALL TESTS**
-
-In total, we have implemented **19 test**s covering the data, model, and training logic.
+In total, we have implemented **24 test**s covering the data, model, training, and API logics.
 The data tests validate raw and processed datasets, including CSV consistency and length, correct one-hot encoding, shape, and to validate the train/test/val splits. The model tests ensure MotifCNN and its Lightning wrapper handle input shapes correctly, raise errors on invalid inputs, and compute outputs and accuracy as expected. Finally, training-related tests verify that the training step and optimizer configuration work as expected, using a simplified, synthetic signal derived from the processed one-hot data to ensure fast, deterministic learning behavior.
-
-**TODO** write about API tests, if we make any
 
 ### Question 8
 
