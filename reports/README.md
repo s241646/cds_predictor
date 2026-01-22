@@ -526,10 +526,10 @@ https://console.cloud.google.com/vertex-ai/training/custom-jobs?project=cds-pred
 > Answer:
 
 --- question 19 fill here ---
-<img width="1398" height="485" alt="image" src="https://github.com/user-attachments/assets/e479a225-ce8b-4690-a73d-2fa1b4fa3788" />
-<img width="942" height="448" alt="image" src="https://github.com/user-attachments/assets/8234d10c-b02e-4289-a8ca-6338319e943a" />
 
-**TO DO** Add screenshot of input/output data saving
+
+![Bucket outputs.](./figures/Q19_bucket.png)
+![Bucket models.](./figures/Q19_bucket_model.png)
 
 ### Question 20
 
