@@ -5,6 +5,9 @@ WORKDIR /app
 COPY pyproject.toml pyproject.toml
 COPY README.md README.md
 COPY uv.lock uv.lock
+COPY data.dvc data.dvc
+COPY .dvc/config .dvc/config
+COPY .dvcignore .dvcignore
 
 RUN uv sync --frozen --no-install-project
 
