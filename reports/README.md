@@ -420,19 +420,20 @@ Together, these metrics and visualizations provide a comprehensive view of model
 >
 > Answer:
 
-We use Docker for training and inference. The Dockerfiles live in `dockerfiles/` (e.g., `dockerfiles/api.dockerfile` and `dockerfiles/train.dockerfile`). We build locally and run when needed. For example, to run the API image:
+We use Docker for both training and inference so the environment is identical across machines. The Dockerfiles live in `dockerfiles/` (for example `dockerfiles/api.dockerfile`, `dockerfiles/train.dockerfile`, and `dockerfiles/frontend.dockerfile`). For local API usage we build and run:
 
 `docker build -f dockerfiles/api.dockerfile -t cds-api .`
 
 `docker run --rm -p 8000:8000 cds-api`
 
-To run training in a container:
+For training, we use the training image and pass Hydra overrides:
 
 `docker build -f dockerfiles/train.dockerfile -t cds-train .`
 
 `docker run --rm cds-train epochs=5`
 
-The API image is also used for Cloud Run deployment. Docker ensures a reproducible environment across machines.
+The training container expects the dataset to be available locally or pulled with DVC at runtime, which avoids baking large data into the image. The API image is also used for Cloud Run deployment, so the container used in development matches production. This setup reduces issues linked to running in different machines. Link to Dockerfile:
+`dockerfiles/api.dockerfile`.
 
 ### Question 16
 
@@ -587,7 +588,7 @@ Example seeing jobs on VM:
 >
 > Answer:
 
-Yes, we built an API using FastAPI in `src/cds_repository/api.py`. The API loads a trained checkpoint and exposes `/health` for status checks and `/predict` for inference. The `/predict` endpoint takes a sequence (or FASTA file, depending on the branch) and returns logits and probabilities. We also added a simple root endpoint that shows the service status. This API is used both locally and in Cloud Run. The main goal was to create a clean inference interface with small inputs and clear outputs.
+Yes, we built an API using FastAPI in `src/cds_repository/api.py`. The API loads a trained checkpoint and exposes lightweight HTTP endpoints for inference. We provide `/health` for status checks, `/` for a basic service message, and `/predict` for inference. The `/predict` endpoint accepts a DNA sequence (and in the extended version can accept FASTA input) and returns logits and a probability score so the client can interpret the model output. We also keep the inputs small and validate them to avoid unnecessary load or failures. This API is used both locally and in Cloud Run so the same interface works in development and production. Overall, the API wraps the model in a simple, repeatable interface that other services and teammates can call without needing to run training code.
 
 ### Question 24
 
@@ -603,13 +604,13 @@ Yes, we built an API using FastAPI in `src/cds_repository/api.py`. The API loads
 >
 > Answer:
 
-Yes, we deployed the API to GCP Cloud Run. The GitHub Actions workflow (`.github/workflows/deploy-cloud-run.yml`) builds the Docker image from `dockerfiles/api.dockerfile`, pushes it to Artifact Registry, and deploys it to a Cloud Run service. The deployed service is public and can be invoked over HTTPS. We validate it by calling `/health`, `/`, and `/predict`. Example usage:
+Yes, we deployed the API to GCP Cloud Run. The GitHub Actions workflow (`.github/workflows/deploy-cloud-run.yml`) builds the Docker image from `dockerfiles/api.dockerfile`, pushes it to Artifact Registry, and deploys it to a Cloud Run service in `europe-west1`. The service is configured to listen on port 8000 and is publicly accessible over HTTPS. We validate the deployment by calling `/health`, `/`, and `/predict` endpoints from a local terminal. Example usage:
 
 `curl https://cds-api-978941563399.europe-west1.run.app/health`
 
 `curl -s -X POST https://cds-api-978941563399.europe-west1.run.app/predict -H "Content-Type: application/json" -d '{"sequence":"ATGCGT"}'`
 
-This confirms the API is live and serving predictions in the cloud.
+This confirms the API is reachable and serving predictions in the cloud, and it also documents how a user would invoke the service after deployment.
 
 ### Question 25
 
@@ -659,7 +660,7 @@ We used Cloud Monitoring for our Cloud Run service. Cloud Run provides built-in 
 > Answer:
 
 --- question 27 fill here ---
-The largest cost to Josefien was the Compute Engine, followed by Vertex AI, due to the training jobs that were ran there.
+The largest cost to the team was the Compute Engine, followed by Vertex AI, due to the training jobs that were ran there.
 **TODO** report on actual costs and cost of api / cloud run later
 
 Working on the cloud was frustrating, because it took a while for all the setups between data, model, training, API, inputs/outputs to work. However, once the connections were established it was useful to run long training jobs, and we experienced it was faster to make predictions on the API with the ckpt from the GCP bucket, versus the local checkpoint. It was frustrating at times to manage permission roles, especially when uploading files to the GCP buckets.
