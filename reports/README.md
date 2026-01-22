@@ -168,12 +168,12 @@ s241646, s184339, s253771, s260422
 >
 > Answer:
 
-We used **uv** for managing our project dependencies. All required packages and their versions are tracked in the **uv.lock** file. To set up a complete copy of our development environment, one would have to follow these steps: 
+We used **uv** for managing our project dependencies. All required packages and their versions are tracked in the **uv.lock** file. To set up a complete copy of our development environment, the following steps should be followed: 
 1. Clone this repository.
 2. Install **uv** (Follow this link: https://docs.astral.sh/uv/getting-started/installation/).
 3. Run **uv sync**. This command reads the **uv.lock** file and installs all dependencies as specified, ensuring an identical environment. 
 
-When adding or updating packages during the development, we use **uv add <package>**, which updates both the **uv.lock** file and the **pyproject.toml** file.
+When adding or updating packages during the development, we use **uv add <package>**, which updates both the **uv.lock** file and the **pyproject.toml** file. The updated files were then pushed to a branch and merged with main. 
 
 ### Question 5
 
@@ -203,7 +203,7 @@ Not filled out yet: ./docs ##FIGURE THIS OUT! Remove or keep?
 
 We have removed the ./notebooks folder because we did not use jupyter notebooks in our project. 
 
-We have added the following folders: ./.dvc (contains DVS configuration for data version control), ./deploy (contains documentation on deployment setup), and ./sweeps (contains a configuration file for hyperparameter search space). 
+We have added the following folders: ./.dvc (contains DVC configuration for data version control), ./deploy (contains documentation on deployment setup), and ./sweeps (contains a configuration file for hyperparameter search space).
 
 ### Question 6
 
