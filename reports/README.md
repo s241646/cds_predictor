@@ -635,7 +635,7 @@ Our testing identified a clear CPU-bound bottleneck during CNN inference. At 10 
 >
 > Answer:
 
-We used Cloud Monitoring for our Cloud Run service. Cloud Run provides built-in metrics such as request count, latency, and error rate. We also instrumented the API with a `/metrics` endpoint that reports request counts, error counts, latency, and basic system info. We created alert policies for 5xx error rate and high latency (p95), and we verified alerts by triggering a request-count alert and receiving an email notification. Monitoring helps us detect slow responses, failures, or unusual input patterns and keep the service reliable. For evidence, we exported the alert policies to `monitoring/alert-policies.json`.
+We used Cloud Monitoring for our Cloud Run service. Cloud Run provides built-in metrics such as request count, latency, and error rate, which we tracked in the Monitoring dashboards. We also instrumented the API with a `/metrics` endpoint that reports request counts, error counts, latency, and basic system info, so we can inspect health even without the GCP console. We created alert policies for 5xx error rate and high latency (p95), and we verified alerts by triggering a request-count alert and receiving an email notification. This gives us both proactive alerts and ongoing visibility into service behavior and performance. For evidence, we exported the alert policies to `monitoring/alert-policies.json`.
 
 ## Overall discussion of project
 
