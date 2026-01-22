@@ -34,7 +34,7 @@ dependencies = [
     "tensorboard>=2.14.0",
     "torch==2.6.0",
     "typer==0.15.1",
-    "uvicorn==0.34.0",
+    "uvicorn==0.40.0",
     "wandb==0.23.0",
 ]
 
