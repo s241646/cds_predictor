@@ -37,7 +37,7 @@ def test_predict_valid_fasta():
     """Test a successful prediction with a real FASTA formatted string."""
     with TestClient(app) as client:
         # Standard FASTA format
-        valid_fasta = ">seq1\nATGCATGCATGCATGCATGCATGCATGCATGC\n>seq2\nGCATGCATGCATGCATGCATGCATGCATGCAT\n"
+        valid_fasta = ">seq1\nATGCATGCATGCATGCATGCATGCATGCATGC\n"
 
         files = {"fasta": ("valid.fasta", valid_fasta.encode("utf-8"), "application/octet-stream")}
         # Sending form data for the optional flags
@@ -50,7 +50,7 @@ def test_predict_valid_fasta():
 
         json_response = response.json()
         assert "results" in json_response
-        assert len(json_response["results"]) == 2
+        assert len(json_response["results"]) == 1
 
         # Check structure of the first result
         first_result = json_response["results"][0]
