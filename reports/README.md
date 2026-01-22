@@ -302,7 +302,7 @@ Once a feature or fix was complete, we created PRs to merge to main, with a shor
 >
 > Answer:
 
-We used DVC to manage data. The `data/` folder is tracked with DVC and stored in a GCP bucket. Git only stores the small `data.dvc` pointer file, which records hashes of the data. When someone runs `dvc pull`, the exact data version is downloaded from the bucket. This helped us keep data consistent across machines and avoid pushing large files to GitHub. It also made the CI workflow possible, because the data can be pulled during a workflow run. If we update data, we run `dvc add data` and `dvc push`, then commit the new `data.dvc`.
+We used DVC to manage data. The `data/` folder is tracked with DVC and stored in a GCP bucket. Git only stores the small `data.dvc` pointer file, which records hashes of the data. When someone runs `dvc pull`, the exact data version is downloaded from the bucket. This helped us keep data consistent across machines and to avoid pushing large files to GitHub. It also made the CI workflow possible, because the data can be pulled during a workflow run. If we update data, we run `dvc add data` and `dvc push`, then commit the new `data.dvc`.
 
 ### Question 11
 
@@ -351,7 +351,12 @@ An example of a triggered workflow can be seen here: https://github.com/s241646/
 >
 > Answer:
 
-We configured experiments by using Hydra config files in the train script. The hyperparameters (batch size, learning rate, scheduler, architecture) are defined in configs/config.yaml. They can be overwritten from the command line, and integrated with hyperparameter sweeps.
+We configured experiments by using Hydra config files in the train script. The optimized hyperparameters (batch size, learning rate, scheduler, architecture) are defined in configs/config.yaml, and the training script loads this configuration using @hydra.main(). The parameters can be overwritten from the command line, for example as:
+```
+python -m cds_repository.train epochs=50 hyperparameters.batch_size=32 dropout=0.3
+```
+
+The parameters can also be integrated with hyperparameter sweeps, using the W&B sweep configurations specified in sweeps/motifcnn_sweep.yaml. 
 
 
 ### Question 13
