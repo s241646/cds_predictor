@@ -190,14 +190,14 @@ When adding or updating packages during the development, we use **uv add <packag
 > Answer:
 
 We initialized our project using the cookiecutter template specifically developed for this course. From the template, we have filled out the following folders: 
-- ./.github/workflows (contains our continuous integration workflow files),
-- ./configs (stores the optimized hyperparameters),
-- ./data folder (stores both raw and processed datasets, as well as temporary files generated when making predictions),
-- the ./dockerfiles (contains Dockerfiles for training and API containers), 
-- ./models (the folder is empty, but it is used for saving trained models when running locally), 
-- ./reports, 
-- ./src/cds_repository (contains all our python scripts),
-- ./tests (contains all our unit test python scripts).  
+- ./.github/workflows (contains our continuous integration workflow files)
+- ./configs (stores the optimized hyperparameters)
+- ./data folder (stores both raw and processed datasets, as well as temporary files generated when making predictions)
+- ./dockerfiles (contains Dockerfiles for training and API containers), 
+- ./models (the folder is empty, but it is used for saving trained models when running locally)
+- ./reports 
+- ./src/cds_repository (contains all our python scripts)
+- ./tests (contains all our unit test python scripts)
 
 Not filled out yet: ./docs ##FIGURE THIS OUT! Remove or keep?
 
@@ -529,7 +529,7 @@ https://console.cloud.google.com/vertex-ai/training/custom-jobs?project=cds-pred
 
 
 ![Bucket outputs.](./figures/Q19_bucket.png)
-![Bucket models.](./figures/Q19_bucket_model.png)
+![Bucket models.](./figures/Q19_bucket_models.png)
 
 ### Question 20
 
@@ -711,7 +711,11 @@ We checked how robust our model is to data drifting. As an experiment, we checke
 >
 > Answer:
 
-The biggest challenges in this project were related to solving merge conflicts, both on GitHub and with DVC. When developing a new functionality, we practiced creating a new branch, pushing to it, and then merging with main, which definitely helped avoiding major merge conflicts. However, sometimes more than one person would work on the same functionality etc. and solving merge comflicts from this was challenging at times. The deployment also took quite some time. It was not because there was any big struggles related to this part, but it was just one of the more time consuming tasks. Furthermore, we also spent a lot of time connecting everything together and making sure that all functionalities were up to date when implementing new things. 
+The biggest challenges in this project were related to solving merge conflicts, both on GitHub and with DVC. When developing a new functionality, we practiced creating a new branch, pushing to it, and then merging with main, which definitely helped avoiding major merge conflicts. However, sometimes more than one person would work on the same functionality etc. and solving merge comflicts from this was challenging at times. 
+
+Apart from the merge conflicts, the deployment also took quite some time. It was not because there was any big struggles related to this part, but it was just one of the more time consuming tasks because none of us had any experience with it. For this reason, it took more time to figure out the cause of each bug. At first it was difficult because we did not know where and how to look for the bugs and solutions to them, but at the end of week 2 we became more familiar with it, and it definitely helped to gain some confidence with working on the cloud. 
+
+Furthermore, we also spent a lot of time connecting everything together and making sure that all functionalities were up to date when implementing new things. 
 
 Overall, we had a good group dynamic and helped each other out, so that challenges did not become too big to overcome for us. 
 
