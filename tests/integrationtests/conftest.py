@@ -4,12 +4,14 @@ import torch
 
 
 @pytest.fixture(autouse=True)
-def mock_inference_pipeline():
-    """Mocks GCS, model loading, and the Lightning Trainer for all tests."""
+def mock_inference_and_storage():
+    """Bypasses GCS, Model loading, and File Uploads for CI."""
+    # Mocking the GCSFileSystem
     with (
         patch("cds_repository.api.get_latest_checkpoint") as mock_ckpt,
         patch("cds_repository.api._load_model") as mock_load,
         patch("pytorch_lightning.Trainer.predict") as mock_predict,
+        patch("gcsfs.GCSFileSystem") as mock_fs,
     ):
         mock_ckpt.return_value = "mock_bucket/model.ckpt"
 
@@ -18,7 +20,11 @@ def mock_inference_pipeline():
         mock_load.return_value = (mock_model, mock_meta)
 
         mock_predict.return_value = [
-            {"preds": torch.tensor([1]), "logits": torch.tensor([2.5]), "probs": torch.tensor([0.92])}
+            {"preds": torch.tensor([1]), "logits": torch.tensor([2.0]), "probs": torch.tensor([0.85])}
         ]
+
+        mock_instance = mock_fs.return_value
+        mock_instance.put.return_value = True
+        mock_instance.ls.return_value = ["mock_file.ckpt"]
 
         yield
