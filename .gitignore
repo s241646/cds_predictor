@@ -185,3 +185,4 @@ logs/
 dvc-github-key.json
 .dvc/cache/
 .dvc/tmp/
+/data
