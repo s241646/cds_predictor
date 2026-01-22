@@ -271,18 +271,21 @@ Log on to VM instance:
 ```
 gcloud compute ssh cds-instance
 ```
-Then log in with gh, clone repo, install dependencies etc.
+Then log in with gh, clone repo, git pull, install dependencies etc.
 
-View VM on GCP:
+View VM status on GCP:
 https://console.cloud.google.com/compute/instances?project=cds-predictor
 
+```
+cd cds_predictor
+```
 
 Train on VM
 ```
 gcloud ai custom-jobs create \
     --region=europe-west1 \
     --display-name=train-run \
-    --config=config_cpu.yaml \
+    --config=config_cpu.yaml
 ```
 
 View progress at GCP: Vertex AI > Model development > Training > Custom jobs
