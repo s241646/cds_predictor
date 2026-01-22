@@ -415,14 +415,19 @@ Together, these metrics and visualizations provide a comprehensive view of model
 >
 > Answer:
 
-We use Docker for training and inference. There are two Dockerfiles: `dockerfiles/train.dockerfile` for training and `dockerfiles/api.dockerfile` for the API. We build them locally and run them when needed. For example, to run the API
-image:
+We use Docker for training and inference. The Dockerfiles live in `dockerfiles/` (e.g., `dockerfiles/api.dockerfile` and `dockerfiles/train.dockerfile`). We build locally and run when needed. For example, to run the API image:
 
 `docker build -f dockerfiles/api.dockerfile -t cds-api .`
 
 `docker run --rm -p 8000:8000 cds-api`
 
-The API image is also used in Cloud Run. The training image can run one training job inside a container. Docker helps us package the environment so other team members can run the same code.
+To run training in a container:
+
+`docker build -f dockerfiles/train.dockerfile -t cds-train .`
+
+`docker run --rm cds-train epochs=5`
+
+The API image is also used for Cloud Run deployment. Docker ensures a reproducible environment across machines.
 
 ### Question 16
 
@@ -454,15 +459,9 @@ The API image is also used in Cloud Run. The training image can run one training
 >
 > Answer:
 
-We used the following services: Vertex AI, Cloud Storage, Compute Engine and Cloud Run.
-Compute Engine is used to create and manage Virtual Machine (VM) instances. We connect to them via SSH and can run training jobs.
-Vertex AI is used to run a custom training jobs on the virtual machines, and monitor its status and logs.
-Cloud Storage is used to store training datasets (integrated wih dvc), model checkpoints from training, container images built via Cloud Build.
-**TO DO** if we used it to store uploaded data?
-Cloud Run is used to deploy the model, allowing us to serve predictions and scale.
-The Artifact Registry is uesd to manage the train and api docker images. They are connected to the github repository and build and push images automatically when there is a change made to main.
-
-This combination enabled scalable training, reliable data storage, and efficient model deployment.
+We used the following services: Cloud Storage, Artifact Registry, Cloud Run, Cloud Build, and Cloud Monitoring.
+Cloud Storage is used as the DVC remote for datasets. Artifact Registry stores our Docker images (API and training).
+Cloud Run hosts the deployed API and provides autoscaling. Cloud Build uses `cloudbuild.yaml` to build and push a training image when triggered. Cloud Monitoring provides built-in Cloud Run metrics and alerting for error rate and latency. This combination covers data storage, container hosting, CI builds, and service monitoring.
 
 ### Question 18
 
@@ -587,13 +586,13 @@ Yes, we built an API using FastAPI in `src/cds_repository/api.py`. The API loads
 >
 > Answer:
 
-Yes, we deployed the API to GCP Cloud Run. The workflow builds the Docker image using `dockerfiles/api.dockerfile`, pushes it to Artifact Registry, and then deploys it to a Cloud Run service. We use a GitHub Actions workflow to automate this on `main` branch pushes. The deployed service is reachable by a public URL. We validate it by calling `/health`, `/`, and `/predict`. Example usage:
+Yes, we deployed the API to GCP Cloud Run. The GitHub Actions workflow (`.github/workflows/deploy-cloud-run.yml`) builds the Docker image from `dockerfiles/api.dockerfile`, pushes it to Artifact Registry, and deploys it to a Cloud Run service. The deployed service is public and can be invoked over HTTPS. We validate it by calling `/health`, `/`, and `/predict`. Example usage:
 
 `curl https://cds-api-978941563399.europe-west1.run.app/health`
 
 `curl -s -X POST https://cds-api-978941563399.europe-west1.run.app/predict -H "Content-Type: application/json" -d '{"sequence":"ATGCGT"}'`
 
-This confirms the model is serving predictions in the cloud.
+This confirms the API is live and serving predictions in the cloud.
 
 ### Question 25
 
