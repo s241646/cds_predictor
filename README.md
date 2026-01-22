@@ -7,7 +7,7 @@ The overall goal of this project is to develop and train a model that can predic
 
 While more complex problem definitions are required to make it useful for real-world scenarios, this project scope is a step in that direction.
 
-The dataset we use is a simplified subset of a dataset curated by a group member for another project. The simplified dataset used for this project is placed in ```/data/raw/training```. Input sequences are short DNA fragments of 300 nucleotides, with a vocabulary of {A, T, G, C}, labeled as 0 (non-coding) or 1 (coding). These are stored in a gzipped csv-file. 
+The dataset we use is a simplified subset of a dataset curated by a group member for another project. The simplified dataset used for this project is placed in ```/data/raw/training```. Input sequences are short DNA fragments of 300 nucleotides, with a vocabulary of {A, T, G, C}, labeled as 0 (non-coding) or 1 (coding). These are stored in a gzipped csv-file.
 
 The dataset includes sequences from 8 bacterial genomes. Sequences are partiotioned so that 4 genomes are used for the training set, 2 genomes for the validation set, and 2 genomes for the test set. This ensures that no sequences from the same genome appear in different partitions. One could also split the sequences based on sequence similarity, but this approach is computationally intensive and not related to the scope of the MLOps course.
 
@@ -81,6 +81,25 @@ Processed data in data/processed is created by running (already done)
 uvx invoke preprocess-data
 ```
 
+## Running the app
+The application is split into a FastAPI backend and a Streamlit frontend.
+### Start the Backend (API)
+The backend handles the model inference. Run this command to start the server:
+```
+uv run uvicorn src.cds_repository.api:app --reload
+```
+API URL: ```http://127.0.0.1:8000```
+
+Swagger Docs: ```http://127.0.0.1:8000/docs```
+
+### Start the Frontend (UI)
+In a new terminal window, run the Streamlit interface:
+```
+uv run streamlit run src/cds_repository/app.py
+```
+Local URL: ```http://127.0.0.1:8501```
+
+
 ## Key Commands
 
 ### Package Management
@@ -121,6 +140,7 @@ WANDB_API_KEY=""
 WANDB_PROJECT=cds_predictor
 WANDB_ENTITY=mlops_group42
 ```
+
 
 ## Unit-tests
 ```uv run pytest tests```
@@ -236,7 +256,7 @@ https://console.cloud.google.com/vertex-ai/training/custom-jobs?project=cds-pred
 
 
 ### Check for data drift (REMOVE?)
-The below command checks for data drift comparing the training data and another dataset, generating reports on both input features and final sequence representations. 
+The below command checks for data drift comparing the training data and another dataset, generating reports on both input features and final sequence representations.
 ```
 #Generate drift report for sequences from genome using alternative genetic code
 python src/cds_repository/data_drift.py --new-file data/processed/drift_check/drift.csv.gz --dataset-name table4
