@@ -233,6 +233,11 @@ gcloud compute instances create cds-instance \
   --image-family=pytorch-2-7-cu128-ubuntu-2204-nvidia-570 \
   --image-project=deeplearning-platform-release
 ```
+
+Or start the existing instance:
+```
+gcloud compute instances start cds-instance
+```
 Log on to VM instance:
 ```
 gcloud compute ssh cds-instance
