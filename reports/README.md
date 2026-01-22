@@ -111,10 +111,10 @@ will check the repositories and the code to verify your answers.
 
 * [ ] Write some documentation for your application (M32)
 * [ ] Publish the documentation to GitHub Pages (M32)
-* [ ] Revisit your initial project description. Did the project turn out as you wanted?
-* [ ] Create an architectural diagram over your MLOps pipeline
-* [ ] Make sure all group members have an understanding about all parts of the project
-* [ ] Uploaded all your code to GitHub
+* [x] Revisit your initial project description. Did the project turn out as you wanted?
+* [x] Create an architectural diagram over your MLOps pipeline
+* [x] Make sure all group members have an understanding about all parts of the project
+* [x] Uploaded all your code to GitHub
 
 ## Group information
 
@@ -368,11 +368,11 @@ The parameters can also be integrated with hyperparameter sweeps, using the W&B 
 >
 > Answer:
 
-The hydro config files were version-controlled (git) and logged to the timestamped folder. Each log stores the exact configuration used. We used fixed random seeds everywhere for reproducibility (to 42). The experiments hyperparameters, metrics and best model artifacts are tracked in Weights & Biases. To rerun past experiments (with access to the W&B team), run:
+The hydra config files were version-controlled (git) and logged to the timestamped folder. Each log stores the exact configuration used. We used fixed random seeds everywhere for reproducibility, which is of course very important (we have set the seed to 42). Each experiments' hyperparameters, metrics, and best model artifacts are tracked in Weights & Biases. Since everyone in the team has access to the same Weights and Biases prject, everyone can access all experiments run from anyone else in the team. To rerun past experiments (with access to the W&B team), the following command can be run:
 ```
 python train.py +wandb_run_id=<run_id>
 ```
-, or reuse the config file.
+, or the config file can be reused (./configs/config.yaml). 
 
 ### Question 14
 
@@ -731,13 +731,12 @@ Overall, we had a good group dynamic and helped each other out, so that challeng
 > *We have used ChatGPT to help debug our code. Additionally, we used GitHub Copilot to help write some of our code.*
 > Answer:
 
---- question 31 fill here ---
+All members of the team contributed equally, but worked mostly on the following: 
+- s241646: Created the MLOps Diagram, setup upGCP model artifacts logging, cloud build and model training on Compute Engine VM. Making data drift checking compatible with API output in GCP bucket. Some docker configurations, pre-commit autoupdate fixes and setting up WandB team and logging.
+- s184339: Generated the datasets and project description, preprocessing of data for application, set up the continuous integration workflow and pre-commit, implemented data drift checking. 
+- s253771: Built the model and training setup, maintained the Dockerfiles for training/deployment, and set up DVC with GCS for data versioning. Also handled deployment/monitoring setup and updated documentation.
+- s260422: Developed the FastAPI application and frontend, including input-output data collection. Refactored training using PyTorch Lightning, integrated Weights & Biases for hyperparameter sweeps, and run profiling. Also established the API testing suite with CI mocking and performed local load testing to identify bottlenecks.
 
-s241646:
-s184339:
-s253771:
-s260422:
-
-All members reviewed each other's work and contributed to debugging, README updates, and pipeline design.
+We always met up in the team, and discussed the different aspects of the tasks we were each doing, as well as to collaborate on a large part of the tasks. All members reviewed each other's work and contributed to debugging, README updates, report writing, and pipeline design. In this way we ensured that all team members had an understanding of the whole project. 
 
 We used generative AI to debug errors, draft workflow steps, and improve documentation. We always verified changes by running commands and checking logs.
