@@ -18,12 +18,13 @@
           "comparison": "COMPARISON_GT",
           "duration": "0s",
           "filter": "resource.type = \"cloud_run_revision\" AND metric.type = \"run.googleapis.com/request_count\"",
+          "thresholdValue": 1.0,
           "trigger": {
             "count": 1
           }
         },
         "displayName": "Cloud Run Revision - Request Count",
-        "name": "projects/cds-predictor/alertPolicies/1595919299004896562/conditions/3125993957291220450"
+        "name": "projects/cds-predictor/alertPolicies/1595919299004896562/conditions/13483131368068146149"
       },
       {
         "conditionThreshold": {
@@ -41,7 +42,7 @@
           }
         },
         "displayName": "Cloud Run Revision - Request Count",
-        "name": "projects/cds-predictor/alertPolicies/1595919299004896562/conditions/3125993957291220747"
+        "name": "projects/cds-predictor/alertPolicies/1595919299004896562/conditions/13483131368068147564"
       }
     ],
     "creationRecord": {
@@ -51,7 +52,7 @@
     "displayName": "Cloud Run 5xx error rate",
     "enabled": true,
     "mutationRecord": {
-      "mutateTime": "2026-01-21T14:46:39.614162843Z",
+      "mutateTime": "2026-01-21T22:32:02.220682832Z",
       "mutatedBy": "dimos.stavaris@gmail.com"
     },
     "name": "projects/cds-predictor/alertPolicies/1595919299004896562",
