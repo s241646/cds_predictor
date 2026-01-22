@@ -393,16 +393,16 @@ python train.py +wandb_run_id=<run_id>
 >
 > Answer:
 
-We tracked and visualized experiments in Weights & Biases, as well as analyzing sweeps.
-We track training and validation loss and accuracy during training, to determine model convergence, overfitting and generalization. A model that does well should decrease validation loss and have increasing validation accuracy.
-<img width="1391" height="739" alt="image" src="https://github.com/user-attachments/assets/5f65ec72-8b57-4681-a13c-b521d537f72d" />
+We tracked and visualized experiments in Weights & Biases, as well as analyzing hyperparameter sweeps.
 
+During training, we track both the loss and accuracy on both the training and validation set. Monitoring of these metrics helps us monitor points of model convergence, potential overfitting and generalization. A model that does well should decrease validation loss, have increasing validation accuracy, and ideally similar training and validation loss when averaged over batches. We could also have logged additional metrics such as AUC, sensitivity and specificity (these would also be useful to monitor since the dataset is imbalanced). 
+![Logging of experiments with loss curves and performance progress in Weights and Biases.](./figures/Q14_wandb_log_progress.png)
 
-The next image shows the parameter importance of the most useful parameter.
-<img width="709" height="335" alt="image" src="https://github.com/user-attachments/assets/30db04af-2b99-4420-a316-5d2491d077b0" />
-From our sweeps, we could infer that learning rate is strongly positvely correlated with train accuracy, while dropout has a negative correlation. This was useful in priotizing impactful hyperparameters.
+The next image shows the parameter importance of the most useful/important parameters based on training accuracy.
+![Screenshot showing which hyperparameters are most important for training accuracy in Weights and Biases.](./figures/Q14_hyperparameter_importance.png)
+From our sweeps, we could infer that learning rate is strongly positvely correlated with train accuracy. Dropout is also important, but has a negative correlation, showcasing that lower dropout rates are preferred. This was useful in priotizing impactful hyperparameters.
 
-<img width="1058" height="299" alt="image" src="https://github.com/user-attachments/assets/652a813e-2bf2-4d5c-88eb-ecb423c8ace9" />
+![Saving of model checkpoints in Weights and Biases.](./figures/Q14_model_checkpoints.png)
 The image above shows the saving of model checkpoints, which are ready to be reused in the API for example. Artifacts are linked to the model registry
 
 Together, these metrics and visualizations provide a comprehensive view of model performance, stability, and reproducibility across experiments.
@@ -673,7 +673,7 @@ Working on the cloud was frustrating, because it took a while for all the setups
 
 We checked how robust our model is to data drifting. As an experiment, we checked for data drift on the input data, between the training set and the test set. The genomes in the training and test sets use the same genetic code (translation table 11). However, for real-world applications we would expect that the method might also be used for sequences that originate from genomes that use alternative genetic codes. For this reason, we also checked for data drift on a genome that uses translation table 4. The script ```src/cds_repository/data_drift.py``` calculates data drift between the training data set and a dataset specified via terminal. It generates a report based both on input features and based on the final sequence representation before the output layer. The reports generated with Evidently can be seen in ```./reports/drift_check/```. 
 
- Comment: Maybe we will have time to implement a drift detection service? 
+ Comment: Maybe we will have time to implement a drift detection service?
 
 ### Question 29
 
@@ -704,7 +704,9 @@ We checked how robust our model is to data drifting. As an experiment, we checke
 >
 > Answer:
 
---- question 30 fill here ---
+The biggest challenges in this project were related to solving merge conflicts, both on GitHub and with DVC. When developing a new functionality, we practiced creating a new branch, pushing to it, and then merging with main, which definitely helped avoiding major merge conflicts. However, sometimes more than one person would work on the same functionality etc. and solving merge comflicts from this was challenging at times. The deployment also took quite some time. It was not because there was any big struggles related to this part, but it was just one of the more time consuming tasks. Furthermore, we also spent a lot of time connecting everything together and making sure that all functionalities were up to date when implementing new things. 
+
+Overall, we had a good group dynamic and helped each other out, so that challenges did not become too big to overcome for us. 
 
 ### Question 31
 
