@@ -596,7 +596,7 @@ Yes, we deployed the API to GCP Cloud Run. The GitHub Actions workflow (`.github
 
 ```bash
 echo -e ">seq1\nATGCATGCATGCATGCATGCATGCATGCATGC" | curl -X 'POST' \
-  '[https://cds-api-978941563399.europe-west1.run.app/predict](https://cds-api-978941563399.europe-west1.run.app/predict)' \
+  'https://cds-api-978941563399.europe-west1.run.app/predict' \
   -H 'accept: application/json' \
   -F 'fasta=@-;filename=valid.fasta;type=application/octet-stream' \
   -F 'return_logits=true' \
