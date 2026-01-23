@@ -326,9 +326,9 @@ Generate drift report for sequences from genome using alternative genetic code
 python src/cds_repository/data_drift.py --new-file data/processed/drift_check/tt4_genome.csv.gz --dataset-name table4
 ```
 
-Generate drift reports for sequences from genome using alternative genetic code
+Check for data drift between training data and another dataset (e.g. incoming data)
 ```
-python src/cds_repository/data_drift.py --new-file data/processed/training/test.csv.gz --dataset-name testset
+python src/cds_repository/data_drift.py --new-file data/path/to/file.csv.gz --dataset-name incoming_data
 ```
 
 Checking for data drift in GCP bucket from inputs to API
