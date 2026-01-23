@@ -173,7 +173,7 @@ We used **uv** for managing our project dependencies. All required packages and 
 2. Install **uv** (Follow this link: https://docs.astral.sh/uv/getting-started/installation/).
 3. Run **uv sync**. This command reads the **uv.lock** file and installs all dependencies as specified, ensuring an identical environment.
 
-When adding or updating packages during the development, we use **uv add <package>**, which updates both the **uv.lock** file and the **pyproject.toml** file. The updated files were then pushed to a branch and merged with main.
+When adding or updating packages during the development, we use **uv add \<package\>**, which updates both the **uv.lock** file and the **pyproject.toml** file. The updated files were then pushed to a branch and merged with main.
 
 ### Question 5
 
