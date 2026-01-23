@@ -192,7 +192,7 @@ When adding or updating packages during the development, we use **uv add \<packa
 We initialized our project using the cookiecutter template specifically developed for this course. From the template, we have filled out the following folders:
 - ./.github/workflows (contains our continuous integration workflow files)
 - ./configs (stores the optimized hyperparameters)
-- ./data folder (stores both raw and processed datasets, as well as temporary files generated when making predictions)
+- ./data (stores both raw and processed datasets, as well as temporary files generated when making predictions)
 - ./dockerfiles (contains Dockerfiles for training and API containers),
 - ./models (the folder is empty, but it is used for saving trained models when running locally)
 - ./reports
@@ -311,16 +311,16 @@ We used DVC to manage data. The `data/` folder is tracked with DVC and stored in
 >
 > Answer:
 
-Our continuous integration setup can be seen in ```./.github/workflows/```. We have organized it into 7 separate files, as described below:
-- Unit testing with pytest (```tests.yaml```): We have defined multiple unit tests (see ```./tests/```), which we test on both macOS, Ubuntu, and Windows. For all operative systems, we test Python versions 3.12 and 3.13. In addition, we test different PyTorch versions (2.5.0, 2.6.0, 2.7.0) on Ubuntu with both Python versions 3.12 and 3.13 to ensure compatability across our supported PyTorch range.
-- Code coverage calculation on Ubuntu with Python 3.12 (```coverage.yaml```): We calculate the code coverage every time something is pushed to the repository. It is indeed not necessary to calculate coverage everytime something is pushed or a pull request is created, but during this project it was an easy way to check the coverage at any time something is modified. 
+Our continuous integration setup in ```./.github/workflows/``` consists of 7 specialized workflows:
+- Unit testing with pytest (```tests.yaml```): We have defined multiple unit tests (see ```./tests/```), which we test on macOS, Ubuntu, and Windows. For all operating systems, we test Python versions 3.12 and 3.13. In Ubuntu, we also test different PyTorch versions (2.5.0, 2.6.0, 2.7.0) with both Python versions to ensure compatability across our supported PyTorch range.
+- Code coverage calculation on Ubuntu with Python 3.12 (```coverage.yaml```): We calculate the code coverage every time something is pushed to the repository. It is indeed not necessary to calculate coverage everytime something is pushed or a pull request is created, but during this project it was an easy way to check the coverage at any time something is modified.
 - Code linting check with ruff (```linting.yaml```): We check that all scripts passes the format checks with ruff, following the standards specified in ./pyproject.toml.
 - Automated pre-commit hook updates (```pre-commit-update.yaml```): Since the ```.pre-commit-config.yaml``` file is not automatically updated by Dependabot, we've created ```pre-commit-update.yaml```, that automatically updates the workflow at midnight and creates a PR if there are any changes to the pre-commit hooks. The workflow can be found here: https://github.com/s241646/cds_predictor/actions/workflows/pre-commit-update.yaml, and uses https://github.com/peter-evans/create-pull-request.
 - Check proper data loading after updates (```data-change.yml```): Checks that data can still be pulled and loaded properly, after changing data-related files.
 - Check model registry change (```model-registry-change.yml```): Triggered when model files change to verify that model artifacts exist in the ./models folder.
 - Deploy API and frontend to Cloud Run (```deploy-cloud-run.yml```): Builds and pushes the API and frontend images to Artifact Registry and deploys them to Cloud Run on pushes to `main`.
 
-We make use of caching, though this is not explicitly visible in the workflow .yaml files. The setup-uv action (astral-sh/setup-uv@v7) has built-in caching that stores both the uv tool itself and the installed Python packages, speeding up our continuous integration runs.
+We utilize `astral-sh/setup-uv@v7` for built-in caching of the `uv` tool and Python packages to accelerate runs.
 
 An example of a triggered workflow can be seen here: https://github.com/s241646/cds_predictor/blob/main/.github/workflows/tests.yaml
 
@@ -362,7 +362,7 @@ The parameters can also be integrated with hyperparameter sweeps, using the W&B 
 >
 > Answer:
 
-The hydra config files were version-controlled (git) and logged to the timestamped folder. Each log stores the exact configuration used. We used fixed random seeds everywhere for reproducibility, which is of course very important (we have set the seed to 42). Each experiments' hyperparameters, metrics, and best model artifacts are tracked in Weights & Biases. Since everyone in the team has access to the same Weights and Biases prject, everyone can access all experiments run from anyone else in the team. To rerun past experiments (with access to the W&B team), the following command can be run:
+The hydra config files were version-controlled (git) and logged to the timestamped folder. Each log stores the exact configuration used. We used fixed random seeds everywhere for reproducibility, which is of course very important (we have set the seed to 42). Each experiments' hyperparameters, metrics, and best model artifacts are tracked in Weights & Biases. Since everyone in the team has access to the same Weights and Biases project, everyone can access all experiments run from anyone else in the team. To rerun past experiments (with access to the W&B team), the following command can be run:
 ```
 python train.py +wandb_run_id=<run_id>
 ```
@@ -390,10 +390,10 @@ During training, we track both the loss and accuracy on both the training and va
 
 The next image shows the parameter importance of the most useful/important parameters based on training accuracy.
 ![Screenshot showing which hyperparameters are most important for training accuracy in Weights and Biases.](./figures/Q14_hyperparameter_importance.png)
-From our sweeps, we could infer that learning rate is strongly positvely correlated with train accuracy. Dropout is also important, but has a negative correlation, showcasing that lower dropout rates are preferred. This was useful in priotizing impactful hyperparameters.
+From our sweeps, we could infer that learning rate is strongly positively correlated with train accuracy. Dropout is also important, but has a negative correlation, showcasing that lower dropout rates are preferred. This was useful in priotizing impactful hyperparameters.
 
 ![Saving of model checkpoints in Weights and Biases.](./figures/Q14_model_checkpoints.png)
-The image above shows the saving of model checkpoints, which are ready to be reused in the API for example. Artifacts are linked to the model registry
+The image above shows the saving of model checkpoints, which are ready to be reused in the API for example. Artifacts are linked to the model registry.
 
 Together, these metrics and visualizations provide a comprehensive view of model performance, stability, and reproducibility across experiments.
 
@@ -553,7 +553,7 @@ https://console.cloud.google.com/vertex-ai/training/custom-jobs?project=cds-pred
 >
 > Answer:
 
-We managed to train our model in the cloud using the Compute Engine. We did this by creating a VM instance with sufficient CPU, memory and disk capacity, with Pytorch already installed. We starting it by the terminal or in GCP, and connecting via SSH. The VM was useful because we could use Vertex Ai's logging to track the status of the training job, and intermediate checkpoints and outputs are saved to storage. This set-up enabled reliable and scalable model training, without relying on local hardware. We could submit a job and check back in after a few hours, without worrying about relying on and using resources of our own devices.
+We managed to train our model in the cloud using the Compute Engine. We did this by creating a VM instance with sufficient CPU, memory and disk capacity, with Pytorch already installed. We start it by the terminal or in GCP, and connect via SSH. The VM was useful because we could use Vertex AI's logging to track the status of the training job, and intermediate checkpoints and outputs are saved to storage. This set-up enabled reliable and scalable model training, without relying on local hardware. We could submit a job and check back in after a few hours, without worrying about relying on and using resources of our own devices.
 
 Example seeing jobs on VM:
 
@@ -574,7 +574,7 @@ Example seeing jobs on VM:
 >
 > Answer:
 
-Yes, we built an API using FastAPI in `src/cds_repository/api.py`. The API loads a trained checkpoint and exposes lightweight HTTP endpoints for inference. We provide `/health` for status checks, `/` for a basic service message, and `/predict` for inference. The `/predict` endpoint accepts a DNA sequence (and in the extended version can accept FASTA input) and returns logits and a probability score so the client can interpret the model output. We also keep the inputs small and validate them to avoid unnecessary load or failures. This API is used both locally and in Cloud Run so the same interface works in development and production. Overall, the API wraps the model in a simple, repeatable interface that other services and teammates can call without needing to run training code.
+Yes, we built an API using FastAPI in `src/cds_repository/api.py`. The API loads a trained checkpoint and exposes lightweight HTTP endpoints for inference. We provide `/health` for status checks, `/` for a basic service message, and `/predict` for inference. The `/predict` endpoint accepts one or multiple DNA sequences in the form of a FASTA file and returns a label per sample and optionally logits and a probability score so the user can interpret the model output. We decided to keep the inputs small and validate them to avoid unnecessary load or failures. This API is used both locally and in Cloud Run so the same interface works in development and production. Overall, the API wraps the model in a simple, repeatable interface that other services and teammates can call without needing to run training code.
 
 ### Question 24
 
@@ -594,7 +594,15 @@ Yes, we deployed the API to GCP Cloud Run. The GitHub Actions workflow (`.github
 
 `curl https://cds-api-978941563399.europe-west1.run.app/health`
 
-`curl -s -X POST https://cds-api-978941563399.europe-west1.run.app/predict -H "Content-Type: application/json" -d '{"sequence":"ATGCGT"}'`
+```bash
+echo -e ">seq1\nATGCATGCATGCATGCATGCATGCATGCATGC" | curl -X 'POST' \
+  '[https://cds-api-978941563399.europe-west1.run.app/predict](https://cds-api-978941563399.europe-west1.run.app/predict)' \
+  -H 'accept: application/json' \
+  -F 'fasta=@-;filename=valid.fasta;type=application/octet-stream' \
+  -F 'return_logits=true' \
+  -F 'return_probs=true' \
+  -F 'batch_size=16'
+  ```
 
 This confirms the API is reachable and serving predictions in the cloud, and it also documents how a user would invoke the service after deployment.
 
@@ -675,7 +683,7 @@ We checked how robust our model is to data drifting. As an experiment, we checke
 
 ![Drift2.](./figures/Q28_drift2.png)
 
-We also created a frontend for our API, which is described in Question 29. 
+We also created a frontend for our API, which is described in Question 29.
 
 ### Question 29
 
@@ -698,11 +706,11 @@ We also created a frontend for our API, which is described in Question 29.
 
 The starting point of the diagram is our GitHub Repository, which should be clones to begin with. When code is pushed to main (or a PR is created), several GitHub Actions run automatically. Some GitHub actions (pre-commit auto-update) run periodically, each day at midnight. When changes are made to the train / api files, the docker image is automatically rebuilt and pushed to the Artifact Registry, tagged with 'latest'. The latest image is deployed via cloud run (both backend and frontend).
 
-To use the ML model, one can either launch the inference API locally or by accessing the link: https://streamlit-frontend-978941563399.europe-west1.run.app/. The Frontend is created with Streamlit. The user can upload a FASTA file, which is converted first to a csv with valid column headers, and then to one-hot encodings. The model returns 1/0. The user's input csv file and the models output are registered in the GCP bucket. The API has a /metrics endpoint to monitor the behaviour.
+To use the ML model, one can either launch the inference API locally or by accessing the link: https://streamlit-frontend-978941563399.europe-west1.run.app/. The Frontend is created with Streamlit. The user can upload a FASTA file, which is converted first to a csv with valid column headers, and then to one-hot encodings. The model returns a binary label (1/0). The user's input csv file and the models output are registered in the GCP bucket. The API has a /metrics endpoint to monitor the behaviour.
 
 In the 'storage' part of the diagram, the link between the DVC and local storage is shown, wich mutually track changes to data.
 
-Pytorch Lightning - based training can either be done locally, or via the Compute Engine VM instance. Both should use data pulled from the DVC, and preprocessed by one-hot encoding. When training on the Compute Engine, logs can be observed in Cloud Logging (Observability), and logs are written to Hydra as well. For local trainingn, WandB logging and agent sweeping is also available, for hyperparameter tuning and importance analysis.
+Pytorch Lightning - based training can either be done locally, or via the Compute Engine VM instance. Both should use data pulled from the DVC, and preprocessed by one-hot encoding. When training on the Compute Engine, logs can be observed in Cloud Logging (Observability), and logs are written to Hydra as well. For local training, WandB logging and agent sweeping is also available, for hyperparameter tuning and importance analysis.
 
 In the right-most box, the remaining logging and monitoring modules of the pipeline are shown. Data drift detection can be done over local data or the saved inputs from the API.
 
@@ -721,7 +729,7 @@ In the right-most box, the remaining logging and monitoring modules of the pipel
 
 The biggest challenges in this project were related to solving merge conflicts, both on GitHub and with DVC. When developing a new functionality, we practiced creating a new branch, pushing to it, and then merging with main, which definitely helped avoiding major merge conflicts. However, sometimes more than one person would work on the same functionality etc. and solving merge comflicts from this was challenging at times.
 
-Apart from the merge conflicts, the deployment also took quite some time. It was not because there was any big struggles related to this part, but it was just one of the more time consuming tasks because none of us had any experience with it. For this reason, it took more time to figure out the cause of each bug. At first it was difficult because we did not know where and how to look for the bugs and solutions to them, but at the end of week 2 we became more familiar with it, and it definitely helped to gain some confidence with working on the cloud.
+Apart from the merge conflicts, the deployment also took quite some time. It was not because there were any big struggles related to this part, but it was just one of the more time consuming tasks because none of us had any experience with it. For this reason, it took more time to figure out the cause of each bug. At first it was difficult because we did not know where and how to look for the bugs and solutions to them, but at the end of week 2 we became more familiar with it, and it definitely helped to gain some confidence with working on the cloud.
 
 Furthermore, we also spent a lot of time connecting everything together and making sure that all functionalities were up to date when implementing new things.
 
@@ -745,7 +753,7 @@ Overall, we had a good group dynamic and helped each other out, so that challeng
 
 All members of the team contributed equally, but worked mostly on the following:
 - s241646: Created the MLOps Diagram, setup upGCP model artifacts logging, cloud build and model training on Compute Engine VM. Making data drift checking compatible with API output in GCP bucket. Some docker configurations, pre-commit autoupdate fixes and setting up WandB team and logging.
-- s184339: Created the project description and datasets, performed data preprocessing for application, set up continuous integration and pre-commit workflows, implemented data drift checks. 
+- s184339: Created the project description and datasets, performed data preprocessing for application, set up continuous integration and pre-commit workflows, implemented data drift checks.
 - s253771: Built the model and the initial training setup, maintained the Dockerfiles for training/deployment, and set up DVC with GCS for data versioning. Also handled deployment/monitoring setup and updated documentation.
 - s260422: Developed the FastAPI application and frontend, including input-output data collection. Refactored training using PyTorch Lightning, integrated Weights & Biases for hyperparameter sweeps, and run profiling. Also established the API testing suite with CI mocking and performed local load testing to identify bottlenecks.
 
