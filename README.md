@@ -50,11 +50,13 @@ The directory structure of the project looks like this:
 │   └── alert-policies.json
 ├── reports/                   # Reports and figures
 │   ├── README.md
+│   ├── mlops_diagram.pdf
 │   ├── report.py
 │   ├── drift_check/
 │   └── figures/
 ├── src/                       # Source code
 │   └── cds_repository/
+│       ├── __init__.py
 │       ├── api.py
 │       ├── app.py
 │       ├── data.py
@@ -68,11 +70,15 @@ The directory structure of the project looks like this:
 ├── tests/                     # Tests
 │   ├── __init__.py
 │   ├── conftest.py
-│   ├── test_api.py
 │   ├── test_data.py
 │   ├── test_model.py
 │   ├── test_train.py
 │   └── utils.py
+│   ├── integrationtests/
+│   │   ├── conftest.py
+│   │   └── test_api.py
+│   └── performancetests/
+│       └── locustfile.py
 ├── .dvcignore
 ├── .gitignore
 ├── .pre-commit-config.yaml
