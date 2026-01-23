@@ -370,7 +370,7 @@ The hydra config files were version-controlled (git) and logged to the timestamp
 ```
 python train.py +wandb_run_id=<run_id>
 ```
-, or the config file can be reused (./configs/config.yaml). 
+, or the config file can be reused (./configs/config.yaml).
 
 ### Question 14
 
@@ -649,6 +649,11 @@ We used Cloud Monitoring for our Cloud Run service. Cloud Run provides built-in 
 >
 > Answer:
 
+--- question 27 fill here ---
+
+The cost overview can be seen below.
+![Billing.](./figures/billing.png)
+
 Based on the GCP billing report, the total project cost so far is $10.62. The largest cost is Compute Engine ($6.08), followed by Vertex AI ($3.71). Smaller costs come from Artifact Registry ($0.37), Cloud Run ($0.31), Networking ($0.11), and Cloud Storage ($0.05), while Cloud Build and Cloud Logging show $0.00. These are shared project costs because we used a common GCP project, so we did not split the spending per person.
 
 Working on the cloud was frustrating, because it took a while for all the setups between data, model, training, API, inputs/outputs to work. However, once the connections were established it was useful to run long training jobs, and we experienced it was faster to make predictions on the API with the ckpt from the GCP bucket, versus the local checkpoint. It was frustrating at times to manage permission roles, especially when uploading files to the GCP buckets.
@@ -739,12 +744,12 @@ Overall, we had a good group dynamic and helped each other out, so that challeng
 > *We have used ChatGPT to help debug our code. Additionally, we used GitHub Copilot to help write some of our code.*
 > Answer:
 
-All members of the team contributed equally, but worked mostly on the following: 
+All members of the team contributed equally, but worked mostly on the following:
 - s241646: Created the MLOps Diagram, setup upGCP model artifacts logging, cloud build and model training on Compute Engine VM. Making data drift checking compatible with API output in GCP bucket. Some docker configurations, pre-commit autoupdate fixes and setting up WandB team and logging.
 - s184339: Generated the datasets and project description, preprocessing of data for application, set up the continuous integration workflow and pre-commit, implemented data drift checking. 
 - s253771: Built the model and the initial training setup, maintained the Dockerfiles for training/deployment, and set up DVC with GCS for data versioning. Also handled deployment/monitoring setup and updated documentation.
 - s260422: Developed the FastAPI application and frontend, including input-output data collection. Refactored training using PyTorch Lightning, integrated Weights & Biases for hyperparameter sweeps, and run profiling. Also established the API testing suite with CI mocking and performed local load testing to identify bottlenecks.
 
-We always met up in the team, and discussed the different aspects of the tasks we were each doing, as well as to collaborate on a large part of the tasks. All members reviewed each other's work and contributed to debugging, README updates, report writing, and pipeline design. In this way we ensured that all team members had an understanding of the whole project. 
+We always met up in the team, and discussed the different aspects of the tasks we were each doing, as well as to collaborate on a large part of the tasks. All members reviewed each other's work and contributed to debugging, README updates, report writing, and pipeline design. In this way we ensured that all team members had an understanding of the whole project.
 
 We used generative AI to debug errors, draft workflow steps, and improve documentation. We always verified changes by running commands and checking logs.
