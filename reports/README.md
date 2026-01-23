@@ -199,9 +199,7 @@ We initialized our project using the cookiecutter template specifically develope
 - ./src/cds_repository (contains all our python scripts)
 - ./tests (contains all our unit test python scripts)
 
-Not filled out yet: ./docs ##FIGURE THIS OUT! Remove or keep?
-
-We have removed the ./notebooks folder because we did not use jupyter notebooks in our project.
+We have removed the  ./docs and ./notebooks folder because we did not create documentation or use jupyter notebooks in our project.
 
 We have added the following folders: ./.dvc (contains DVC configuration for data version control), ./deploy (contains documentation on deployment setup), and ./sweeps (contains a configuration file for hyperparameter search space).
 
