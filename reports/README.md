@@ -148,7 +148,7 @@ s241646, s184339, s253771, s260422
 >
 > Answer:
 
---- question 3 fill here ---
+We mainly used the tools suggested in the course and did not rely on additional open-source frameworks beyond those.
 
 ## Coding environment
 
@@ -199,11 +199,9 @@ We initialized our project using the cookiecutter template specifically develope
 - ./src/cds_repository (contains all our python scripts)
 - ./tests (contains all our unit test python scripts)
 
-Not filled out yet: ./docs ##FIGURE THIS OUT! Remove or keep?
+We did not include a `docs/` folder because we did not publish documentation, and we removed the `notebooks/` folder since we did not use Jupyter notebooks.
 
-We have removed the ./notebooks folder because we did not use jupyter notebooks in our project.
-
-We have added the following folders: ./.dvc (contains DVC configuration for data version control), ./deploy (contains documentation on deployment setup), and ./sweeps (contains a configuration file for hyperparameter search space).
+We have added the following folders: `./.dvc` (contains DVC configuration for data version control) and `./sweeps` (contains a configuration file for hyperparameter search space).
 
 ### Question 6
 
@@ -322,7 +320,7 @@ Our continuous integration setup can be seen in ```./.github/workflows/```. We h
 - Automated pre-commit hook updates (```pre-commit-update.yaml```): Since the ```.pre-commit-config.yaml``` file is not automatically updated by Dependabot, we've created ```pre-commit-update.yaml```, that automatically updates the workflow at midnight and creates a PR if there are any changes to the pre-commit hooks. The workflow can be found here: https://github.com/s241646/cds_predictor/actions/workflows/pre-commit-update.yaml, and uses https://github.com/peter-evans/create-pull-request.
 - Check proper data loading after updates (```data-change.yml```): Checks that data can still be pulled and loaded properly, after changing data-related files.
 - Check model registry change (```model-registry-change.yml```): Triggered when model files change to verify that model artifacts exist in the ./models folder.
-- (```deploy-cloud-run.yml```): **ADD HERE**
+- Deploy API and frontend to Cloud Run (```deploy-cloud-run.yml```): Builds and pushes the API and frontend images to Artifact Registry and deploys them to Cloud Run on pushes to `main`.
 
 We make use of caching, though this is not explicitly visible in the workflow .yaml files. The setup-uv action (astral-sh/setup-uv@v7) has built-in caching that stores both the uv tool itself and the installed Python packages, speeding up our continuous integration runs.
 
@@ -416,7 +414,7 @@ Together, these metrics and visualizations provide a comprehensive view of model
 >
 > Answer:
 
-We use Docker for both training and inference so the environment is identical across machines. The Dockerfiles live in `dockerfiles/` (for example `dockerfiles/api.dockerfile`, `dockerfiles/train.dockerfile`, and `dockerfiles/frontend.dockerfile`). For local API usage we build and run:
+We use Docker for both training and inference so the environment is identical across machines. The Dockerfiles live in `dockerfiles/` (`dockerfiles/api.dockerfile`, `dockerfiles/train.dockerfile`, and `dockerfiles/frontend.dockerfile`). For local API usage we build and run:
 
 `docker build -f dockerfiles/api.dockerfile -t cds-api .`
 
@@ -474,7 +472,8 @@ We used the following services: Cloud Storage, Artifact Registry, Cloud Run, Clo
 - Cloud Run hosts the deployed API and provides autoscaling.
 - Cloud Build uses `cloudbuild.yaml` to build and push a training image when triggered.
 - Cloud Monitoring provides built-in Cloud Run metrics and alerting for error rate and latency.
-- Cloud Logging enables inspection of custom train jobs logs
+- Cloud Logging enables inspection of custom train jobs logs.
+
 This combination covers data storage, container hosting, CI builds, and service monitoring.
 
 ### Question 18
@@ -522,9 +521,6 @@ https://console.cloud.google.com/vertex-ai/training/custom-jobs?project=cds-pred
 >
 > Answer:
 
---- question 19 fill here ---
-
-
 ![Bucket outputs.](./figures/Q19_bucket1.png)
 ![Bucket models.](./figures/Q19_bucket2.png)
 
@@ -535,7 +531,6 @@ https://console.cloud.google.com/vertex-ai/training/custom-jobs?project=cds-pred
 >
 > Answer:
 
---- question 20 fill here ---
 ![Artifacts.](./figures/Q20_artifacts.png)
 
 
@@ -564,7 +559,7 @@ https://console.cloud.google.com/vertex-ai/training/custom-jobs?project=cds-pred
 We managed to train our model in the cloud using the Compute Engine. We did this by creating a VM instance with sufficient CPU, memory and disk capacity, with Pytorch already installed. We starting it by the terminal or in GCP, and connecting via SSH. The VM was useful because we could use Vertex Ai's logging to track the status of the training job, and intermediate checkpoints and outputs are saved to storage. This set-up enabled reliable and scalable model training, without relying on local hardware. We could submit a job and check back in after a few hours, without worrying about relying on and using resources of our own devices.
 
 Example seeing jobs on VM:
-![Artifacts.](./figures/Q21_VM.png)
+![Artifacts.](./figures/Q22_VM.png)
 
 ## Deployment
 
@@ -654,9 +649,7 @@ We used Cloud Monitoring for our Cloud Run service. Cloud Run provides built-in 
 >
 > Answer:
 
---- question 27 fill here ---
-The largest cost to the team was the Compute Engine, followed by Vertex AI, due to the training jobs that were ran there.
-**TODO** report on actual costs and cost of api / cloud run later
+Based on the GCP billing report, the total project cost so far is $10.62. The largest cost is Compute Engine ($6.08), followed by Vertex AI ($3.71). Smaller costs come from Artifact Registry ($0.37), Cloud Run ($0.31), Networking ($0.11), and Cloud Storage ($0.05), while Cloud Build and Cloud Logging show $0.00. These are shared project costs because we used a common GCP project, so we did not split the spending per person.
 
 Working on the cloud was frustrating, because it took a while for all the setups between data, model, training, API, inputs/outputs to work. However, once the connections were established it was useful to run long training jobs, and we experienced it was faster to make predictions on the API with the ckpt from the GCP bucket, versus the local checkpoint. It was frustrating at times to manage permission roles, especially when uploading files to the GCP buckets.
 
@@ -749,7 +742,7 @@ Overall, we had a good group dynamic and helped each other out, so that challeng
 All members of the team contributed equally, but worked mostly on the following: 
 - s241646: Created the MLOps Diagram, setup upGCP model artifacts logging, cloud build and model training on Compute Engine VM. Making data drift checking compatible with API output in GCP bucket. Some docker configurations, pre-commit autoupdate fixes and setting up WandB team and logging.
 - s184339: Generated the datasets and project description, preprocessing of data for application, set up the continuous integration workflow and pre-commit, implemented data drift checking. 
-- s253771: Built the model and training setup, maintained the Dockerfiles for training/deployment, and set up DVC with GCS for data versioning. Also handled deployment/monitoring setup and updated documentation.
+- s253771: Built the model and the initial training setup, maintained the Dockerfiles for training/deployment, and set up DVC with GCS for data versioning. Also handled deployment/monitoring setup and updated documentation.
 - s260422: Developed the FastAPI application and frontend, including input-output data collection. Refactored training using PyTorch Lightning, integrated Weights & Biases for hyperparameter sweeps, and run profiling. Also established the API testing suite with CI mocking and performed local load testing to identify bottlenecks.
 
 We always met up in the team, and discussed the different aspects of the tasks we were each doing, as well as to collaborate on a large part of the tasks. All members reviewed each other's work and contributed to debugging, README updates, report writing, and pipeline design. In this way we ensured that all team members had an understanding of the whole project. 
