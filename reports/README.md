@@ -649,8 +649,6 @@ We used Cloud Monitoring for our Cloud Run service. Cloud Run provides built-in 
 >
 > Answer:
 
---- question 27 fill here ---
-
 The cost overview can be seen below.
 ![Billing.](./figures/billing.png)
 
