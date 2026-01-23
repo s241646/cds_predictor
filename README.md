@@ -40,11 +40,6 @@ The directory structure of the project looks like this:
 │   ├── api.dockerfile
 │   ├── frontend.dockerfile
 │   └── train.dockerfile
-├── docs/                      # Documentation
-│   ├── README.md
-│   ├── mkdocs.yaml
-│   └── source/
-│       └── index.md
 ├── models/                    # Trained models
 ├── monitoring/                # Monitoring artifacts
 │   └── alert-policies.json
