@@ -17,6 +17,7 @@ We decided to limit the time spent on model development and instead focus on the
 
 The directory structure of the project looks like this:
 ```txt
+├── .devcontainer/             # Dev container config
 ├── .dvc/                      # DVC config/cache (local)
 ├── .github/                   # GitHub config
 │   ├── agents/
@@ -35,8 +36,6 @@ The directory structure of the project looks like this:
 │   ├── processed/
 │   ├── raw/
 │   └── tmp/
-├── deploy/                    # Deployment docs
-│   └── README.md
 ├── dockerfiles/               # Dockerfiles
 │   ├── api.dockerfile
 │   ├── frontend.dockerfile
@@ -77,6 +76,7 @@ The directory structure of the project looks like this:
 ├── .dvcignore
 ├── .gitignore
 ├── .pre-commit-config.yaml
+├── .python-version
 ├── AGENTS.md
 ├── cloudbuild.yaml
 ├── config_cpu.yaml
@@ -227,12 +227,40 @@ uv run dvc status -c
 ```
 
 ### Artifact Registry
-Our image registry is:
+We use two Artifact Registry repositories:
 ```
-europe-west1-docker.pkg.dev/cds-predictor/cds-images
+europe-west1-docker.pkg.dev/cds-predictor/cds-images   # Cloud Run (API + frontend)
+europe-west1-docker.pkg.dev/cds-predictor/cds-repo     # Training image (Cloud Build/Vertex AI)
 ```
 
-On pushes to `main`, the deploy workflow builds and pushes the API image and deploys to Cloud Run.
+On pushes to `main`, the deploy workflow builds and pushes the API image to `cds-images` and deploys to Cloud Run.
+
+### Cloud Run deployment
+One-time setup (local):
+```
+gcloud services enable artifactregistry.googleapis.com run.googleapis.com
+gcloud artifacts repositories create cds-images \
+  --repository-format=docker \
+  --location=europe-west1 \
+  --description="CDS predictor images"
+gcloud auth configure-docker europe-west1-docker.pkg.dev
+```
+
+GitHub Actions secret: create a service account with `Artifact Registry Writer`, `Cloud Run Admin`, and
+`Service Account User`, then store its JSON key in GitHub Actions as `GCP_SA_KEY`.
+
+Manual deploy (optional):
+```
+IMAGE=europe-west1-docker.pkg.dev/cds-predictor/cds-images/cds-api:latest
+docker build -f dockerfiles/api.dockerfile -t "$IMAGE" .
+docker push "$IMAGE"
+gcloud run deploy cds-api \
+  --image "$IMAGE" \
+  --region europe-west1 \
+  --platform managed \
+  --port 8000 \
+  --allow-unauthenticated
+```
 
 ### To connect docker with gcloud:
 ```
@@ -241,10 +269,7 @@ gcloud auth configure-docker europe-west1-docker.pkg.dev
 
 ### To pull an image
 ```
-docker pull europe-west1-docker.pkg.dev/cds-predictor/cds-repo/<image>:<tag>
-```
-For example:
-```
+docker pull europe-west1-docker.pkg.dev/cds-predictor/cds-images/cds-api:latest
 docker pull europe-west1-docker.pkg.dev/cds-predictor/cds-repo/train:latest
 ```
 
@@ -294,11 +319,14 @@ https://console.cloud.google.com/vertex-ai/training/custom-jobs?project=cds-pred
 
 ### Check for data drift
 The below command checks for data drift comparing the training data and another dataset, generating reports on both input features and final sequence representations.
-```
-#Generate drift report for sequences from genome using alternative genetic code
-python src/cds_repository/data_drift.py --new-file data/processed/drift_check/tt4_genome.csv.gz --dataset-name table4
 
-#Generate drift reports for sequences from genome using alternative genetic code
+Generate drift report for sequences from genome using alternative genetic code
+```
+python src/cds_repository/data_drift.py --new-file data/processed/drift_check/tt4_genome.csv.gz --dataset-name table4
+```
+
+Generate drift reports for sequences from genome using alternative genetic code
+```
 python src/cds_repository/data_drift.py --new-file data/processed/training/test.csv.gz --dataset-name testset
 ```
 
