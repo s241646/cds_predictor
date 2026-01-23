@@ -216,7 +216,7 @@ We have added the following folders: `./.dvc` (contains DVC configuration for da
 >
 > Answer:
 
-We use pre-commit hooks to automatically run checks before code is committed, ensuring consistent standards across the team during the project. For linting and code quality, we use Ruff, which helps catch common bugs, unused code, and style issues. For formatting, we used on Ruff Format, which ensures consistent code style with formatting rules which are enforced via pre-commit-hooks, for example removing trailing whitespace and ensuring files end with a newlines.
+We use pre-commit hooks to automatically run checks before code is committed, ensuring consistent standards across the team during the project. For linting and code quality, we use Ruff, which helps catch common bugs, unused code, and style issues. For formatting, we used Ruff Format, which ensures consistent code style with formatting rules which are enforced via pre-commit-hooks, for example removing trailing whitespace and ensuring files end with a newline.
 
 Ruff provides lightweight type checks that improve code correctness. Documentation is supported through well-structured README files, which explain the project structure and usage.
 
@@ -262,9 +262,7 @@ uv run coverage report -m > reports/coverage.txt
 ```
 , and also is automatically calculated when pull requests are made to main. The coverage report is available as an artifact and linked as URL in the workflow run under 'Upload coverage artifact'.
 
-The total code coverage of our code is 86%, which includes all our source files. Coverage is high overall, but some gaps remain, particularly in data.py and model.py, where certain branches and edge cases are not tested. While high coverage increases confidence in the correctness of the code, even 100% coverage would not guarantee it is completely error-free. Code coverage only measures which lines are executed during tests, not whether the logic is correct and bugs can still exist. If the tests do not cover all edge cases, the coverage is also irrepresentative of the code's performance. Therefore, while coverage is a valuable metric, it should be complemented with code reviews and further testing to ensure robust and reliable code.
-
-##REWRITE AFTER API
+The total code coverage of our code is 80%. Coverage is high overall, but some gaps remain, particularly in data.py and api.py, where certain branches and edge cases are not tested. While high coverage increases confidence in the correctness of the code, even 100% coverage would not guarantee it is completely error-free. Code coverage only measures which lines are executed during tests, not whether the logic is correct and bugs can still exist. If the tests do not cover all edge cases, the coverage is also irrepresentative of the code's performance. Therefore, while coverage is a valuable metric, it should be complemented with code reviews and further testing to ensure robust and reliable code.
 
 ### Question 9
 
@@ -281,7 +279,7 @@ The total code coverage of our code is 86%, which includes all our source files.
 
 We used branches and PRs in our project. In our group, we used branches for adding new features. Each feature was developed separately on a branch, instead of the main branch. Most of the time one member worked on a branch, but other times a member could easily pick up another one's branch.
 
-Once a feature or fix was complete, we created PRs to merge to main, with a short description of the changes / new feature. Most of the time other members reviewed the PRs (sometimes in person), to catch any issues before affecting other code. For changes to the README we directly committed to main. Overall, using branches and PRs helped keep our codebase organized and reduced merge conflicts, as well as be able to trace back to early versions, if needed.
+Once a feature or fix was complete, we created PRs to merge to main, with a short description of the changes or new feature. Most of the time other members reviewed the PRs (sometimes in person), to catch any issues before affecting other code. For changes to the README we directly committed to main most of the time. Overall, using branches and PRs helped to keep our codebase organized and reduced merge conflicts, as well as be able to trace back to early versions, if needed.
 
 ### Question 10
 
@@ -315,7 +313,7 @@ We used DVC to manage data. The `data/` folder is tracked with DVC and stored in
 
 Our continuous integration setup can be seen in ```./.github/workflows/```. We have organized it into 7 separate files, as described below:
 - Unit testing with pytest (```tests.yaml```): We have defined multiple unit tests (see ```./tests/```), which we test on both macOS, Ubuntu, and Windows. For all operative systems, we test Python versions 3.12 and 3.13. In addition, we test different PyTorch versions (2.5.0, 2.6.0, 2.7.0) on Ubuntu with both Python versions 3.12 and 3.13 to ensure compatability across our supported PyTorch range.
-- Code coverage calculation on Ubuntu with Python 3.12 (```coverage.yaml```): We calculate the code coverage every time something is pushed to the repository. This is not necessary, but gives as an easy way to check the coverage at any time something is modified. ... **REMOVE?**
+- Code coverage calculation on Ubuntu with Python 3.12 (```coverage.yaml```): We calculate the code coverage every time something is pushed to the repository. It is indeed not necessary to calculate coverage everytime something is pushed or a pull request is created, but during this project it was an easy way to check the coverage at any time something is modified. 
 - Code linting check with ruff (```linting.yaml```): We check that all scripts passes the format checks with ruff, following the standards specified in ./pyproject.toml.
 - Automated pre-commit hook updates (```pre-commit-update.yaml```): Since the ```.pre-commit-config.yaml``` file is not automatically updated by Dependabot, we've created ```pre-commit-update.yaml```, that automatically updates the workflow at midnight and creates a PR if there are any changes to the pre-commit hooks. The workflow can be found here: https://github.com/s241646/cds_predictor/actions/workflows/pre-commit-update.yaml, and uses https://github.com/peter-evans/create-pull-request.
 - Check proper data loading after updates (```data-change.yml```): Checks that data can still be pulled and loaded properly, after changing data-related files.
@@ -325,8 +323,6 @@ Our continuous integration setup can be seen in ```./.github/workflows/```. We h
 We make use of caching, though this is not explicitly visible in the workflow .yaml files. The setup-uv action (astral-sh/setup-uv@v7) has built-in caching that stores both the uv tool itself and the installed Python packages, speeding up our continuous integration runs.
 
 An example of a triggered workflow can be seen here: https://github.com/s241646/cds_predictor/blob/main/.github/workflows/tests.yaml
-
-
 
 ## Running code and tracking experiments
 
@@ -448,7 +444,7 @@ We did profile the code, and below is a screenshot of the output report:
 
 ![Logging of experiments with loss curves and performance progress in Weights and Biases.](./figures/Q16_profiler_results.jpeg)
 
-One training epoch only took about 30 seconds which we believe is already quite fast. For this reason, we did not try to optimize our code based on the profiling. We think that code can always be optimized somehow (and hence it is not perfect), but for this project we decided to prioritize our resoruces elsewhere.
+One training epoch only took about 30 seconds which we think is already quite fast. For this reason, we did not try to optimize our code based on the profiling. We think that code can always be optimized somehow (and hence it is not perfect), but for this project we decided to prioritize our resources elsewhere.
 
 
 ## Working in the cloud
@@ -522,6 +518,7 @@ https://console.cloud.google.com/vertex-ai/training/custom-jobs?project=cds-pred
 > Answer:
 
 ![Bucket outputs.](./figures/Q19_bucket1.png)
+
 ![Bucket models.](./figures/Q19_bucket2.png)
 
 ### Question 20
@@ -559,6 +556,7 @@ https://console.cloud.google.com/vertex-ai/training/custom-jobs?project=cds-pred
 We managed to train our model in the cloud using the Compute Engine. We did this by creating a VM instance with sufficient CPU, memory and disk capacity, with Pytorch already installed. We starting it by the terminal or in GCP, and connecting via SSH. The VM was useful because we could use Vertex Ai's logging to track the status of the training job, and intermediate checkpoints and outputs are saved to storage. This set-up enabled reliable and scalable model training, without relying on local hardware. We could submit a job and check back in after a few hours, without worrying about relying on and using resources of our own devices.
 
 Example seeing jobs on VM:
+
 ![Artifacts.](./figures/Q22_VM.png)
 
 ## Deployment
@@ -650,6 +648,7 @@ We used Cloud Monitoring for our Cloud Run service. Cloud Run provides built-in 
 > Answer:
 
 The cost overview can be seen below.
+
 ![Billing.](./figures/billing.png)
 
 Based on the GCP billing report, the total project cost so far is $10.62. The largest cost is Compute Engine ($6.08), followed by Vertex AI ($3.71). Smaller costs come from Artifact Registry ($0.37), Cloud Run ($0.31), Networking ($0.11), and Cloud Storage ($0.05), while Cloud Build and Cloud Logging show $0.00. These are shared project costs because we used a common GCP project, so we did not split the spending per person.
@@ -670,11 +669,13 @@ Working on the cloud was frustrating, because it took a while for all the setups
 >
 > Answer:
 
-We checked how robust our model is to data drifting. As an experiment, we checked for data drift on the input data, between the training set and the test set. The genomes in the training and test sets use the same genetic code (translation table 11). However, for real-world applications we would expect that the method might also be used for sequences that originate from genomes that use alternative genetic codes. For this reason, we also checked for data drift on a genome that uses translation table 4. The script ```src/cds_repository/data_drift.py``` calculates data drift between the training data set and a dataset specified via terminal. It generates a report based both on input features and based on the final sequence representation (embeddings) before the output layer. The reports generated with Evidently can be seen in ```./reports/drift_check/```. The drift check can also be ran on uploaded data from the API. See README for useage.
+We checked how robust our model is to data drifting. As an experiment, we checked for data drift on the input data, between the training set and the test set. The genomes in the training and test sets use the same genetic code (translation table 11). However, for real-world applications we would expect that the method might also be used for sequences that originate from genomes that use alternative genetic codes. For this reason, we also checked for data drift on a genome that uses translation table 4. The script ```src/cds_repository/data_drift.py``` calculates data drift between the training data set and a dataset specified via terminal. It generates a report based both on input features and based on the final sequence representation (embeddings) before the output layer. The reports generated with Evidently can be seen in ```./reports/drift_check/```. The drift check can also be ran on uploaded data from the API, which reflects typical usage. See README for usage.
 
 
 ![Drift.](./figures/Q28_drift.png)
 ![Drift2.](./figures/Q28_drift2.png)
+
+We also created a frontend for our API, which can be accessed [here](https://streamlit-frontend-978941563399.europe-west1.run.app). 
 
 ### Question 29
 
@@ -744,7 +745,7 @@ Overall, we had a good group dynamic and helped each other out, so that challeng
 
 All members of the team contributed equally, but worked mostly on the following:
 - s241646: Created the MLOps Diagram, setup upGCP model artifacts logging, cloud build and model training on Compute Engine VM. Making data drift checking compatible with API output in GCP bucket. Some docker configurations, pre-commit autoupdate fixes and setting up WandB team and logging.
-- s184339: Generated the datasets and project description, preprocessing of data for application, set up the continuous integration workflow and pre-commit, implemented data drift checking. 
+- s184339: Created the project description and datasets, performed data preprocessing for application, set up continuous integration and pre-commit workflows, implemented data drift checks. 
 - s253771: Built the model and the initial training setup, maintained the Dockerfiles for training/deployment, and set up DVC with GCS for data versioning. Also handled deployment/monitoring setup and updated documentation.
 - s260422: Developed the FastAPI application and frontend, including input-output data collection. Refactored training using PyTorch Lightning, integrated Weights & Biases for hyperparameter sweeps, and run profiling. Also established the API testing suite with CI mocking and performed local load testing to identify bottlenecks.
 
