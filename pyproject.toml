@@ -23,7 +23,7 @@ dependencies = [
     "dvc>=3.66.1",
     "dvc-gs>=3.0.2",
     "evidently==0.7.20",
-    "fastapi==0.115.6",
+    "fastapi==0.128.0",
     "gcsfs>=2025.12.0",
     "hydra-core>=1.3.2",
     "invoke>=2.2.0",
